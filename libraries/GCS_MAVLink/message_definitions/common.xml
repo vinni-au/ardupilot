@@ -49,6 +49,15 @@
                <entry value="14" name="MAV_AUTOPILOT_AUTOQUAD">
                     <description>AutoQuad -- http://autoquad.org</description>
                </entry>
+               <entry value="15" name="MAV_AUTOPILOT_ARMAZILA">
+                    <description>Armazila -- http://armazila.com</description>
+               </entry>
+               <entry value="16" name="MAV_AUTOPILOT_AEROB">
+                    <description>Aerob -- http://aerob.ru</description>
+               </entry>
+               <entry value="255" name="MAV_AUTOPILOT_GEOSCAN401">
+                    <description>GEOSCAN 401</description>
+               </entry>
           </enum>
           <enum name="MAV_TYPE">
                <entry value="0" name="MAV_TYPE_GENERIC">

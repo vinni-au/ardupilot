@@ -2,8 +2,12 @@
  *	@brief MAVLink comm protocol generated from ardupilotmega.xml
  *	@see http://qgroundcontrol.org/mavlink/
  */
-#ifndef ARDUPILOTMEGA_H
-#define ARDUPILOTMEGA_H
+#ifndef MAVLINK_ARDUPILOTMEGA_H
+#define MAVLINK_ARDUPILOTMEGA_H
+
+#ifndef MAVLINK_H
+    #error Wrong include order: MAVLINK_ARDUPILOTMEGA.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +37,7 @@ extern "C" {
 /** @brief Enumeration of possible mount operation modes */
 #ifndef HAVE_ENUM_MAV_MOUNT_MODE
 #define HAVE_ENUM_MAV_MOUNT_MODE
-enum MAV_MOUNT_MODE
+typedef enum MAV_MOUNT_MODE
 {
 	MAV_MOUNT_MODE_RETRACT=0, /* Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop stabilization | */
 	MAV_MOUNT_MODE_NEUTRAL=1, /* Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM. | */
@@ -41,13 +45,13 @@ enum MAV_MOUNT_MODE
 	MAV_MOUNT_MODE_RC_TARGETING=3, /* Load neutral position and start RC Roll,Pitch,Yaw control with stabilization | */
 	MAV_MOUNT_MODE_GPS_POINT=4, /* Load neutral position and start to point to Lat,Lon,Alt | */
 	MAV_MOUNT_MODE_ENUM_END=5, /*  | */
-};
+} MAV_MOUNT_MODE;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_MAV_CMD
 #define HAVE_ENUM_MAV_CMD
-enum MAV_CMD
+typedef enum MAV_CMD
 {
 	MAV_CMD_NAV_WAYPOINT=16, /* Navigate to MISSION. |Hold time in decimal seconds. (ignored by fixed wing, time to stay at MISSION for rotary wing)| Acceptance radius in meters (if the sphere with this radius is hit, the MISSION counts as reached)| 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.| Desired yaw angle at MISSION (rotary wing)| Latitude| Longitude| Altitude|  */
 	MAV_CMD_NAV_LOITER_UNLIM=17, /* Loiter around this MISSION an unlimited amount of time |Empty| Empty| Radius around MISSION, in meters. If positive loiter clockwise, else counter-clockwise| Desired yaw angle.| Latitude| Longitude| Altitude|  */
@@ -89,39 +93,39 @@ enum MAV_CMD
 	MAV_CMD_MISSION_START=300, /* start running a mission |first_item: the first mission item to run| last_item:  the last mission item to run (after this item is run, the mission ends)|  */
 	MAV_CMD_COMPONENT_ARM_DISARM=400, /* Arms / Disarms a component |1 to arm, 0 to disarm|  */
 	MAV_CMD_ENUM_END=401, /*  | */
-};
+} MAV_CMD;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_FENCE_ACTION
 #define HAVE_ENUM_FENCE_ACTION
-enum FENCE_ACTION
+typedef enum FENCE_ACTION
 {
 	FENCE_ACTION_NONE=0, /* Disable fenced mode | */
 	FENCE_ACTION_GUIDED=1, /* Switched to guided mode to return point (fence point 0) | */
 	FENCE_ACTION_REPORT=2, /* Report fence breach, but don't take action | */
 	FENCE_ACTION_GUIDED_THR_PASS=3, /* Switched to guided mode to return point (fence point 0) with manual throttle control | */
 	FENCE_ACTION_ENUM_END=4, /*  | */
-};
+} FENCE_ACTION;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_FENCE_BREACH
 #define HAVE_ENUM_FENCE_BREACH
-enum FENCE_BREACH
+typedef enum FENCE_BREACH
 {
 	FENCE_BREACH_NONE=0, /* No last fence breach | */
 	FENCE_BREACH_MINALT=1, /* Breached minimum altitude | */
 	FENCE_BREACH_MAXALT=2, /* Breached maximum altitude | */
 	FENCE_BREACH_BOUNDARY=3, /* Breached fence boundary | */
 	FENCE_BREACH_ENUM_END=4, /*  | */
-};
+} FENCE_BREACH;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_LIMITS_STATE
 #define HAVE_ENUM_LIMITS_STATE
-enum LIMITS_STATE
+typedef enum LIMITS_STATE
 {
 	LIMITS_INIT=0, /*  pre-initialization | */
 	LIMITS_DISABLED=1, /*  disabled | */
@@ -130,30 +134,30 @@ enum LIMITS_STATE
 	LIMITS_RECOVERING=4, /*  taking action eg. RTL | */
 	LIMITS_RECOVERED=5, /*  we're no longer in breach of a limit | */
 	LIMITS_STATE_ENUM_END=6, /*  | */
-};
+} LIMITS_STATE;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_LIMIT_MODULE
 #define HAVE_ENUM_LIMIT_MODULE
-enum LIMIT_MODULE
+typedef enum LIMIT_MODULE
 {
 	LIMIT_GPSLOCK=1, /*  pre-initialization | */
 	LIMIT_GEOFENCE=2, /*  disabled | */
 	LIMIT_ALTITUDE=4, /*  checking limits | */
 	LIMIT_MODULE_ENUM_END=5, /*  | */
-};
+} LIMIT_MODULE;
 #endif
 
 /** @brief Flags in RALLY_POINT message */
 #ifndef HAVE_ENUM_RALLY_FLAGS
 #define HAVE_ENUM_RALLY_FLAGS
-enum RALLY_FLAGS
+typedef enum RALLY_FLAGS
 {
 	FAVORABLE_WIND=1, /* Flag set when requiring favorable winds for landing.  | */
 	LAND_IMMEDIATELY=2, /* Flag set when plane is to immediately descend to break altitude and land without GCS intervention.  Flag not set when plane is to loiter at Rally point until commanded to land. | */
 	RALLY_FLAGS_ENUM_END=3, /*  | */
-};
+} RALLY_FLAGS;
 #endif
 
 #include "../common/common.h"
@@ -200,4 +204,4 @@ enum RALLY_FLAGS
 #ifdef __cplusplus
 }
 #endif // __cplusplus
-#endif // ARDUPILOTMEGA_H
+#endif // MAVLINK_ARDUPILOTMEGA_H

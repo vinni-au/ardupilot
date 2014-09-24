@@ -108,7 +108,7 @@ static NOINLINE void send_heartbeat(mavlink_channel_t chan)
 #else
   #error Unrecognised frame type
 #endif
-        MAV_AUTOPILOT_ARDUPILOTMEGA,
+        MAV_AUTOPILOT_GS401,
         base_mode,
         custom_mode,
         system_status);

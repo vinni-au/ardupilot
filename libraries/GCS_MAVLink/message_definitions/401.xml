@@ -437,12 +437,30 @@
         <field name="foc_len"   type="float"   >Focal Length (mm)</field> <!-- per-image to support zooms. Zero means fixed focal length or unknown. Should be true mm, not scaled to 35mm film equivalent -->
         <field name="flags"     type="uint8_t" >See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask</field> <!-- future proofing -->
     </message>
-
+    
     <message name="BATTERY2" id="181">
       <description>2nd Battery status</description>
       <field type="uint16_t" name="voltage">voltage in millivolts</field>
       <field type="int16_t" name="current_battery">Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current</field>
     </message>
 
-     </messages>
+    <message name="CAMERA_FEEDBACK_COUNT" id="182">
+        <description>Information about camera feedbacks saved onboard</description>
+        <field name="count" type="uint16_t">Number of feedbacks</field>
+    </message> 
+    
+    <message name="CAMERA_FEEDBACK_REQUEST_LIST" id="183">
+        <description>Request camera feedback infos</description>
+        <field name="target_system" type="uint8_t">System ID</field>
+        <field name="cam_idx" type="uint8_t">Camera ID</field>
+    </message>
+    
+    <message name="CAMERA_FEEDBACK_REQUEST" id="184">
+        <description>Requst camera feedback with given photo id</description>
+        <field name="target_system" type="uint8_t" >System ID</field>   <!-- support multiple concurrent vehicles -->  
+        <field name="cam_idx"   type="uint8_t" >Camera ID</field>       <!-- component ID, to support multiple cameras -->
+        <field name="img_idx" type="uint16_t">Image index</field>
+    </message>
+
+    </messages>
 </mavlink>

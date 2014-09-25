@@ -3,8 +3,14 @@
 #ifdef USERHOOK_INIT
 void userhook_init()
 {
-    // put your initialisation code here
-    // this will be called once at start-up
+#if CAMERA == ENABLED && defined(CAMERA_STORAGE)
+	CameraStorage.size = 0;
+#endif
+#ifdef CAMERA_STORAGE_ENABLED
+    CameraDataFlash.Init(log_structure, sizeof(log_structure)/sizeof(log_structure[0]));
+    CameraDataFlash.StartNewLog();
+#endif
+
 }
 #endif
 
@@ -39,6 +45,5 @@ void userhook_SlowLoop()
 #ifdef USERHOOK_SUPERSLOWLOOP
 void userhook_SuperSlowLoop()
 {
-    // put your 1Hz code here
 }
 #endif

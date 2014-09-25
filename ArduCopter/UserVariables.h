@@ -17,3 +17,15 @@ int                 WiiDisplacementY=0;
 #endif  // USERHOOK_VARIABLES
 
 
+// uncomment this to enable camera storage
+#define CAMERA_STORAGE
+
+#if CAMERA == ENABLED && defined(CAMERA_STORAGE)
+struct camera_storage_t {
+	uint16_t size;
+} CameraStorage;
+#endif
+#if defined(CAMERA_STORAGE) && defined(HAL_BOARD_LOG_DIRECTORY)
+#define CAMERA_STORAGE_ENABLED
+DataFlash_File CameraDataFlash(HAL_BOARD_LOG_DIRECTORY "/CAMERA");
+#endif

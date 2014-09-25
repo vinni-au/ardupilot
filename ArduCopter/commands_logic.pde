@@ -913,8 +913,18 @@ static void do_take_picture()
 {
 #if CAMERA == ENABLED
     camera.trigger_pic();
+    // send camera feedback to GCS
+#if defined(CAMERA_STORAGE)
+    gcs_send_message(MSG_CAMERA_FEEDBACK);
+    CameraStorage.size++;
+#endif
+    // write to log
     if (g.log_bitmask & MASK_LOG_CAMERA) {
         DataFlash.Log_Write_Camera(ahrs, gps, current_loc);
     }
+#endif
+#ifdef CAMERA_STORAGE_ENABLED
+    // write picture info in camera storage
+    CameraDataFlash.Log_Write_Camera(ahrs, gps, current_loc);
 #endif
 }

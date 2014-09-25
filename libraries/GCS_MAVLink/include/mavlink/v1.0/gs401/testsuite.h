@@ -1,9 +1,9 @@
 /** @file
- *	@brief MAVLink comm protocol testsuite generated from ardupilotmega.xml
+ *	@brief MAVLink comm protocol testsuite generated from gs401.xml
  *	@see http://qgroundcontrol.org/mavlink/
  */
-#ifndef ARDUPILOTMEGA_TESTSUITE_H
-#define ARDUPILOTMEGA_TESTSUITE_H
+#ifndef GS401_TESTSUITE_H
+#define GS401_TESTSUITE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,12 +12,12 @@ extern "C" {
 #ifndef MAVLINK_TEST_ALL
 #define MAVLINK_TEST_ALL
 static void mavlink_test_common(uint8_t, uint8_t, mavlink_message_t *last_msg);
-static void mavlink_test_ardupilotmega(uint8_t, uint8_t, mavlink_message_t *last_msg);
+static void mavlink_test_gs401(uint8_t, uint8_t, mavlink_message_t *last_msg);
 
 static void mavlink_test_all(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_common(system_id, component_id, last_msg);
-	mavlink_test_ardupilotmega(system_id, component_id, last_msg);
+	mavlink_test_gs401(system_id, component_id, last_msg);
 }
 #endif
 
@@ -1516,7 +1516,139 @@ static void mavlink_test_battery2(uint8_t system_id, uint8_t component_id, mavli
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
-static void mavlink_test_ardupilotmega(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+static void mavlink_test_camera_feedback_count(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_camera_feedback_count_t packet_in = {
+		17235
+    };
+	mavlink_camera_feedback_count_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.count = packet_in.count;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_count_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_camera_feedback_count_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_count_pack(system_id, component_id, &msg , packet1.count );
+	mavlink_msg_camera_feedback_count_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_count_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.count );
+	mavlink_msg_camera_feedback_count_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_camera_feedback_count_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_count_send(MAVLINK_COMM_1 , packet1.count );
+	mavlink_msg_camera_feedback_count_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_camera_feedback_request_list(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_camera_feedback_request_list_t packet_in = {
+		5,72
+    };
+	mavlink_camera_feedback_request_list_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.target_system = packet_in.target_system;
+        	packet1.cam_idx = packet_in.cam_idx;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_list_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_camera_feedback_request_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_list_pack(system_id, component_id, &msg , packet1.target_system , packet1.cam_idx );
+	mavlink_msg_camera_feedback_request_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_list_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.target_system , packet1.cam_idx );
+	mavlink_msg_camera_feedback_request_list_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_camera_feedback_request_list_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_list_send(MAVLINK_COMM_1 , packet1.target_system , packet1.cam_idx );
+	mavlink_msg_camera_feedback_request_list_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_camera_feedback_request(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_camera_feedback_request_t packet_in = {
+		17235,139,206
+    };
+	mavlink_camera_feedback_request_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.img_idx = packet_in.img_idx;
+        	packet1.target_system = packet_in.target_system;
+        	packet1.cam_idx = packet_in.cam_idx;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_camera_feedback_request_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_pack(system_id, component_id, &msg , packet1.target_system , packet1.cam_idx , packet1.img_idx );
+	mavlink_msg_camera_feedback_request_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.target_system , packet1.cam_idx , packet1.img_idx );
+	mavlink_msg_camera_feedback_request_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_camera_feedback_request_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_camera_feedback_request_send(MAVLINK_COMM_1 , packet1.target_system , packet1.cam_idx , packet1.img_idx );
+	mavlink_msg_camera_feedback_request_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
+static void mavlink_test_gs401(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_test_sensor_offsets(system_id, component_id, last_msg);
 	mavlink_test_set_mag_offsets(system_id, component_id, last_msg);
@@ -1549,9 +1681,12 @@ static void mavlink_test_ardupilotmega(uint8_t system_id, uint8_t component_id, 
 	mavlink_test_camera_status(system_id, component_id, last_msg);
 	mavlink_test_camera_feedback(system_id, component_id, last_msg);
 	mavlink_test_battery2(system_id, component_id, last_msg);
+	mavlink_test_camera_feedback_count(system_id, component_id, last_msg);
+	mavlink_test_camera_feedback_request_list(system_id, component_id, last_msg);
+	mavlink_test_camera_feedback_request(system_id, component_id, last_msg);
 }
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
-#endif // ARDUPILOTMEGA_TESTSUITE_H
+#endif // GS401_TESTSUITE_H

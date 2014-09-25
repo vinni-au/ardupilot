@@ -37,7 +37,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
 
-#include "include/mavlink/v1.0/401/version.h"
+#include "include/mavlink/v1.0/gs401/version.h"
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_APM1 || CONFIG_HAL_BOARD == HAL_BOARD_APM2
 // this allows us to make mavlink_message_t much smaller. It means we
@@ -126,7 +126,7 @@ static inline void crc_accumulate(uint8_t data, uint16_t *crcAccum)
 bool comm_is_idle(mavlink_channel_t chan);
 
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS
-#include "include/mavlink/v1.0/401/mavlink.h"
+#include "include/mavlink/v1.0/gs401/mavlink.h"
 
 uint8_t mavlink_check_target(uint8_t sysid, uint8_t compid);
 

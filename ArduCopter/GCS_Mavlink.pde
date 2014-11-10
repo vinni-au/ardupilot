@@ -1274,6 +1274,7 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
             result = mavlink_motor_test_start(chan, (uint8_t)packet.param1, (uint8_t)packet.param2, (uint16_t)packet.param3, packet.param4);
             break;
 
+
         default:
             result = MAV_RESULT_UNSUPPORTED;
             break;
@@ -1372,7 +1373,8 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
         break;
 
     case MAVLINK_MSG_ID_DIGICAM_CONTROL:
-        camera.control_msg(msg);
+    	do_take_picture();
+        //camera.control_msg(msg);
         break;
 #endif // CAMERA == ENABLED
 

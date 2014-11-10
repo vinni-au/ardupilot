@@ -902,6 +902,7 @@ static void do_roi(const AP_Mission::Mission_Command& cmd)
 // do_take_picture - take a picture with the camera library
 static void do_take_picture()
 {
+	gcs_send_text_P(SEVERITY_LOW, PSTR("Taking picture..."));
 #if CAMERA == ENABLED
     camera.trigger_pic();
     // send camera feedback to GCS

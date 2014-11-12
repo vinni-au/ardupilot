@@ -133,6 +133,17 @@
           <entry name="FAVORABLE_WIND" value="1"> <description>Flag set when requiring favorable winds for landing. </description></entry>
           <entry name="LAND_IMMEDIATELY" value="2"> <description>Flag set when plane is to immediately descend to break altitude and land without GCS intervention.  Flag not set when plane is to loiter at Rally point until commanded to land.</description></entry>
 	</enum>
+	
+	<!-- Camera event types -->
+    <enum name="CAMERA_STATUS_TYPES">
+        <entry name="CAMERA_STATUS_TYPE_HEARTBEAT"  value="0"><description>Camera heartbeat, announce camera component ID at 1hz</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_TRIGGER"    value="1"><description>Camera image triggered</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_DISCONNECT" value="2"><description>Camera connection lost</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_ERROR"      value="3"><description>Camera unknown error</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_LOWBATT"    value="4"><description>Camera battery low. Parameter p1 shows reported voltage</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_LOWSTORE"   value="5"><description>Camera storage low. Parameter p1 shows reported shots remaining</description></entry>
+        <entry name="CAMERA_STATUS_TYPE_LOWSTOREV"  value="6"><description>Camera storage low. Parameter p1 shows reported video minutes remaining</description></entry>
+    </enum>
 
       </enums>
 
@@ -425,6 +436,56 @@
 	     <field name="idx" type="uint8_t">point index (first point is 0)</field>
       </message>
 -->
+
+  <!-- camera event message from CCB to autopilot: for image trigger events but also things like heartbeat, error, low power, full card, etc -->
+    <message name="CAMERA_STATUS" id="179">
+        <description>Camera Event</description>
+        <field name="time_usec" type="uint64_t">Image timestamp (microseconds since UNIX epoch, according to camera clock)</field>    
+        <field name="target_system" type="uint8_t" >System ID</field>   <!-- support multiple concurrent vehicles -->  
+        <field name="cam_idx"   type="uint8_t" >Camera ID</field>       <!-- component ID, to support multiple cameras -->
+        <field name="img_idx"   type="uint16_t" >Image index</field>    <!-- per camera image index, should be unique+sequential within a mission, preferably non-wrapping -->
+        <field name="event_id"  type="uint8_t" >See CAMERA_STATUS_TYPES enum for definition of the bitmask</field>
+        <field name="p1"        type="float"   >Parameter 1 (meaning depends on event, see CAMERA_STATUS_TYPES enum)</field>
+        <field name="p2"        type="float"   >Parameter 2 (meaning depends on event, see CAMERA_STATUS_TYPES enum)</field>
+        <field name="p3"        type="float"   >Parameter 3 (meaning depends on event, see CAMERA_STATUS_TYPES enum)</field>
+        <field name="p4"        type="float"   >Parameter 4 (meaning depends on event, see CAMERA_STATUS_TYPES enum)</field>
+    </message>
+
+    <!-- camera feedback message - can be originated from CCB (in response to a CAMERA_STATUS), or directly from the autopilot as part of a DO_DIGICAM_CONTROL-->
+    <message name="CAMERA_FEEDBACK" id="180">
+        <description>Camera Capture Feedback</description>
+        <field name="time_usec" type="uint64_t">Image timestamp (microseconds since UNIX epoch), as passed in by CAMERA_STATUS message (or autopilot if no CCB)</field>
+        <field name="target_system" type="uint8_t" >System ID</field>   <!-- support multiple concurrent vehicles -->  
+        <field name="cam_idx"   type="uint8_t" >Camera ID</field>       <!-- component ID, to support multiple cameras -->
+        <field name="img_idx"   type="uint16_t">Image index</field>     <!-- per camera image index, should be unique+sequential within a mission, preferably non-wrapping -->
+        <field name="lat"       type="int32_t" >Latitude in (deg * 1E7)</field>
+        <field name="lng"       type="int32_t" >Longitude in (deg * 1E7)</field>
+        <field name="alt_msl"   type="float"   >Altitude Absolute (meters AMSL)</field>
+        <field name="alt_rel"   type="float"   >Altitude Relative (meters above HOME location)</field>
+        <field name="roll"      type="float"   >Camera Roll angle (earth frame, degrees, +-180)</field>  <!-- initially only supporting fixed cameras, in future we'll need feedback messages from the gimbal so we can include that offset here -->
+        <field name="pitch"     type="float"   >Camera Pitch angle (earth frame, degrees, +-180)</field> <!-- initially only supporting fixed cameras, in future we'll need feedback messages from the gimbal so we can include that offset here -->
+        <field name="yaw"       type="float"   >Camera Yaw (earth frame, degrees, 0-360, true)</field>   <!-- initially only supporting fixed cameras, in future we'll need feedback messages from the gimbal so we can include that offset here -->
+        <field name="foc_len"   type="float"   >Focal Length (mm)</field> <!-- per-image to support zooms. Zero means fixed focal length or unknown. Should be true mm, not scaled to 35mm film equivalent -->
+        <field name="flags"     type="uint8_t" >See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask</field> <!-- future proofing -->
+    </message>
+
+    <message name="CAMERA_FEEDBACK_COUNT" id="182">
+        <description>Information about camera feedbacks saved onboard</description>
+        <field name="count" type="uint16_t">Number of feedbacks</field>
+    </message> 
+    
+    <message name="CAMERA_FEEDBACK_REQUEST_LIST" id="183">
+        <description>Request camera feedback infos</description>
+        <field name="target_system" type="uint8_t">System ID</field>
+        <field name="cam_idx" type="uint8_t">Camera ID</field>
+    </message>
+    
+    <message name="CAMERA_FEEDBACK_REQUEST" id="184">
+        <description>Requst camera feedback with given photo id</description>
+        <field name="target_system" type="uint8_t" >System ID</field>   <!-- support multiple concurrent vehicles -->  
+        <field name="cam_idx"   type="uint8_t" >Camera ID</field>       <!-- component ID, to support multiple cameras -->
+        <field name="img_idx" type="uint16_t">Image index</field>
+    </message>
 
      </messages>
 </mavlink>

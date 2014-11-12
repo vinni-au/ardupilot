@@ -994,7 +994,6 @@
  # define LOGGING_ENABLED                ENABLED
 #endif
 
-
 #ifndef LOG_ATTITUDE_FAST
  # define LOG_ATTITUDE_FAST             DISABLED
 #endif

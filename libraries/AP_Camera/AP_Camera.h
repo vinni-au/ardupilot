@@ -29,7 +29,8 @@ public:
     /// Constructor
     ///
     AP_Camera(AP_Relay *obj_relay) :
-        _trigger_counter(0)             // count of number of cycles shutter has been held open
+        _trigger_counter(0),             // count of number of cycles shutter has been held open
+        _photo_count(0)
     {
 		AP_Param::setup_object_defaults(this, var_info);
         _apm_relay = obj_relay;
@@ -52,6 +53,8 @@ public:
     // Update location of vehicle and return true if a picture should be taken
     bool update_location(const struct Location &loc);
 
+    uint16_t		photo_count() const { return _photo_count; }
+
     static const struct AP_Param::GroupInfo        var_info[];
 
 private:
@@ -61,6 +64,7 @@ private:
     AP_Int16        _servo_off_pwm;     // PWM value to move servo to when shutter is deactivated
     uint8_t         _trigger_counter;   // count of number of cycles shutter has been held open
     AP_Relay       *_apm_relay;         // pointer to relay object from the base class Relay. The subclasses could be AP_Relay_APM1 or AP_Relay_APM2
+    uint16_t		_photo_count;		// number of photos
 
     void            servo_pic();        // Servo operated camera
     void            relay_pic();        // basic relay activation

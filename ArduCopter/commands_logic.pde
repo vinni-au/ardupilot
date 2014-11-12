@@ -1032,5 +1032,6 @@ static void do_take_picture()
     if (g.log_bitmask & MASK_LOG_CAMERA) {
         Log_Write_Camera();
     }
+    gcs_send_message(MSG_CAMERA_FEEDBACK);
 #endif
 }

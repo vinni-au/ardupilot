@@ -504,6 +504,37 @@ static void NOINLINE send_statustext(mavlink_channel_t chan)
         s->text);
 }
 
+#if CAMERA == ENABLED
+static void NOINLINE send_camera_feedback(mavlink_channel_t chan)
+{
+    int32_t altitude, altitude_rel;
+    if (current_loc.options & 0b1) {
+        altitude = current_loc.alt+home.alt;
+        altitude_rel = current_loc.alt;
+    } else {
+        altitude = current_loc.alt;
+        altitude_rel = current_loc.alt - home.alt;
+    }
+
+    mavlink_msg_camera_feedback_send(
+			chan, //chan
+			micros(), //time_usec
+			g.sysid_this_mav,//target_system
+			0,//cam_idx
+			camera.photo_count() - 1,//img_idx
+			current_loc.lat, //lat
+			current_loc.lng,//lng
+			altitude*0.01f,//alt_msl
+			altitude_rel*0.01f,//alt_rel
+			degrees(ahrs.roll),//roll
+			degrees(ahrs.pitch),//pitch
+			degrees(ahrs.yaw),//yaw
+			0,//foc_len
+			0//flags
+			);
+}
+#endif
+
 // are we still delaying telemetry to try to avoid Xbee bricking?
 static bool telemetry_delayed(mavlink_channel_t chan)
 {
@@ -661,6 +692,14 @@ static bool mavlink_try_send_message(mavlink_channel_t chan, enum ap_message id,
         CHECK_PAYLOAD_SIZE(HWSTATUS);
         send_hwstatus(chan);
         break;
+
+
+#if CAMERA == ENABLED
+    case MSG_CAMERA_FEEDBACK:
+    	CHECK_PAYLOAD_SIZE(CAMERA_FEEDBACK);
+    	send_camera_feedback(chan);
+    	break;
+#endif
 
     case MSG_RETRY_DEFERRED:
         break; // just here to prevent a warning
@@ -1225,7 +1264,6 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
                 result = MAV_RESULT_ACCEPTED;
             }
             break;
-
 
         default:
             result = MAV_RESULT_UNSUPPORTED;
@@ -1949,6 +1987,10 @@ mission_failed:
     case MAVLINK_MSG_ID_DIGICAM_CONTROL:
     {
         camera.control_msg(msg);
+        if (g.log_bitmask & MASK_LOG_CAMERA) {
+            Log_Write_Camera();
+        }
+        gcs_send_message(MSG_CAMERA_FEEDBACK);
         break;
     }
 #endif // CAMERA == ENABLED

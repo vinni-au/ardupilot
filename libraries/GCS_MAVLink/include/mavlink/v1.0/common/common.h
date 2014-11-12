@@ -56,8 +56,8 @@ typedef enum MAV_AUTOPILOT
 	MAV_AUTOPILOT_AUTOQUAD=14, /* AutoQuad -- http://autoquad.org | */
 	MAV_AUTOPILOT_ARMAZILA=15, /* Armazila -- http://armazila.com | */
 	MAV_AUTOPILOT_AEROB=16, /* Aerob -- http://aerob.ru | */
-	MAV_AUTOPILOT_GEOSCAN401=255, /* GEOSCAN 401 | */
-	MAV_AUTOPILOT_ENUM_END=256, /*  | */
+	MAV_AUTOPILOT_GEOSCAN401=17, /* GEOSCAN 401 | */
+	MAV_AUTOPILOT_ENUM_END=18, /*  | */
 } MAV_AUTOPILOT;
 #endif
 

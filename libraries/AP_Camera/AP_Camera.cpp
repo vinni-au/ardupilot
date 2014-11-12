@@ -84,6 +84,7 @@ AP_Camera::trigger_pic()
         relay_pic();                    // basic relay activation
         break;
     }
+    _photo_count++;
 }
 
 /// de-activate the trigger after some delay, but without using a delay() function

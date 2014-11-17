@@ -30,6 +30,7 @@ public:
     virtual uint16_t find_last_log(void) = 0;
     virtual void get_log_boundaries(uint16_t log_num, uint16_t & start_page, uint16_t & end_page) = 0;
     virtual uint16_t get_num_logs(void) = 0;
+    virtual uint16_t get_log_msg_count(uint16_t log_num, uint8_t type) = 0;
     virtual void LogReadProcess(uint16_t log_num,
                                 uint16_t start_page, uint16_t end_page, 
                                 uint8_t num_types,

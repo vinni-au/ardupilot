@@ -2021,6 +2021,66 @@ mission_failed:
         gcs_send_message(MSG_CAMERA_FEEDBACK);
         break;
     }
+
+    case MAVLINK_MSG_ID_CAMERA_FEEDBACK_REQUEST_LIST:
+    {
+    	uint16_t logs_count = DataFlash.get_num_logs();
+    	uint16_t feedbacks_count = 0;
+    	if (logs_count != 0 && camera.photo_count() == 0) {
+        	uint16_t last_log_num = DataFlash.find_last_log();
+        	feedbacks_count = DataFlash.get_log_msg_count(last_log_num, LOG_CAMERA_MSG);
+        	camera.set_photo_count(feedbacks_count);
+    	}
+
+    	mavlink_msg_camera_feedback_count_send(chan, camera.photo_count());
+    	break;
+    }
+
+    case MAVLINK_MSG_ID_CAMERA_FEEDBACK_REQUEST:
+    {
+    	uint16_t logs_count = DataFlash.get_num_logs();
+    	if (logs_count == 0) {
+    		break;
+    	}
+
+    	mavlink_camera_feedback_request_t packet;
+    	mavlink_msg_camera_feedback_request_decode(msg, &packet);
+
+    	uint16_t last_log_num = DataFlash.find_last_log();
+    	uint8_t data[90];
+    	uint16_t indx = 0;
+    	uint16_t len = DataFlash.get_log_msg_data(last_log_num, LOG_CAMERA_MSG, packet.img_idx, data);
+    	if (len > 0) {
+    		int ofs = 0;
+    		// IHLLeccC
+#define decode_value(type, name) \
+type name;\
+memcpy(&name, &data[ofs], sizeof(name));\
+ofs += sizeof(name);
+
+    		decode_value(float, gpsTime);
+    		decode_value(uint16_t, gpsWeek);
+    		decode_value(int32_t, lat);
+    		decode_value(int32_t, lon);
+    		decode_value(int32_t, alt);
+    		decode_value(int16_t, roll);
+    		decode_value(int16_t, pitch);
+    		decode_value(uint16_t, yaw);
+
+ #undef decode_value
+
+    		mavlink_msg_camera_feedback_send(chan,
+    				0, // time_usec
+    				g.sysid_my_gcs, // target_system
+    				0, // cam_idx
+    				packet.img_idx, // img_idx
+    				lat, lon, // lat, lon
+    				alt*0.01f, alt*0.01f, // alt_msl, alt_rel
+    				roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
+    				0, 0);
+    	}
+    	break;
+    }
 #endif // CAMERA == ENABLED
 
 #if MOUNT == ENABLED
@@ -2067,6 +2127,7 @@ mission_failed:
         break;
     }
 
+    //XXX
     case MAVLINK_MSG_ID_LOG_REQUEST_LIST ... MAVLINK_MSG_ID_LOG_REQUEST_END:
         if (!in_mavlink_delay && !motors.armed()) {
             handle_log_message(msg, DataFlash);

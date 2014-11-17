@@ -80,7 +80,6 @@ void GCS_MAVLINK::handle_log_request_list(mavlink_message_t *msg, DataFlash_Clas
     handle_log_send_listing(dataflash);
 }
 
-
 /**
    handle request for log data
  */

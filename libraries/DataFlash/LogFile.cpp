@@ -435,6 +435,121 @@ void DataFlash_Block::_print_log_formats(AP_HAL::BetterStream *port)
     }
 }
 
+/**
+ *
+ */
+uint16_t DataFlash_Block::get_log_msg_count(uint16_t log_num, uint8_t type)
+{
+	uint8_t log_step = 0;
+	uint16_t start_page, end_page;
+	uint16_t result = 0;
+
+	get_log_boundaries(log_num, start_page, end_page);
+	uint16_t page = start_page;
+
+	if (df_BufferIdx != 0) {
+		FinishWrite();
+		hal.scheduler->delay(100);
+	}
+
+	StartRead(start_page);
+
+	while (true) {
+		uint8_t data;
+		ReadBlock(&data, 1);
+
+		switch (log_step) {
+		case 0:
+			if (data == HEAD_BYTE1) {
+				++log_step;
+			}
+			break;
+		case 1:
+			if (data == HEAD_BYTE2) {
+				++log_step;
+			}
+			break;
+		case 2:
+			log_step = 0;
+			if (data == type) {
+				++result;
+			}
+			break;
+		}
+        uint16_t new_page = GetPage();
+        if (new_page != page) {
+            if (new_page == end_page+1 || new_page == start_page) {
+                return result;
+            }
+            page = new_page;
+        }
+	}
+
+	return result;
+}
+
+uint16_t DataFlash_Block::get_log_msg_data(uint16_t log_num, uint8_t type, uint16_t index, uint8_t *data)
+{
+	uint8_t log_step = 0;
+	uint16_t start_page, end_page;
+	uint16_t idx = 0;
+
+	get_log_boundaries(log_num, start_page, end_page);
+	uint16_t page = start_page;
+
+	if (df_BufferIdx != 0) {
+		FinishWrite();
+		hal.scheduler->delay(100);
+	}
+
+	StartRead(start_page);
+
+	while (true) {
+		uint8_t b;
+		ReadBlock(&b, 1);
+
+		switch (log_step) {
+		case 0:
+			if (b == HEAD_BYTE1) {
+				++log_step;
+			}
+			break;
+		case 1:
+			if (b == HEAD_BYTE2) {
+				++log_step;
+			}
+			break;
+		case 2:
+			log_step = 0;
+			if (b == type) {
+				++idx;
+				if (idx == index) {
+					//here it is! determine type to read certain amount of data
+				    uint8_t i;
+				    for (i=0; i<_num_types; i++) {
+				        if (b == PGM_UINT8(&_structures[i].msg_type)) {
+				            break;
+				        }
+				    }
+				    uint8_t msg_len = PGM_UINT8(&_structures[i].msg_len) - 3;
+					ReadBlock(data, msg_len);
+					return msg_len;
+				}
+			}
+			break;
+		}
+        uint16_t new_page = GetPage();
+        if (new_page != page) {
+            if (new_page == end_page+1 || new_page == start_page) {
+                return idx;
+            }
+            page = new_page;
+        }
+	}
+
+	return idx;
+}
+
 /*
   Read the log and print it on port
 */

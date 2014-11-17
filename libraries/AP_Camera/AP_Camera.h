@@ -55,6 +55,8 @@ public:
 
     uint16_t		photo_count() const { return _photo_count; }
 
+    void			set_photo_count(uint16_t photo_count) { _photo_count = photo_count; }
+
     static const struct AP_Param::GroupInfo        var_info[];
 
 private:

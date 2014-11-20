@@ -541,13 +541,13 @@ uint16_t DataFlash_Block::get_log_msg_data(uint16_t log_num, uint8_t type, uint1
         uint16_t new_page = GetPage();
         if (new_page != page) {
             if (new_page == end_page+1 || new_page == start_page) {
-                return idx;
+                return 0;
             }
             page = new_page;
         }
 	}
 
-	return idx;
+	return 0;
 }
 
 /*

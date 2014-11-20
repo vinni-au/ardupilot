@@ -34,6 +34,7 @@ public:
     virtual int16_t get_log_data(uint16_t log_num, uint16_t page, uint32_t offset, uint16_t len, uint8_t *data) = 0;
     virtual uint16_t get_num_logs(void) = 0;
     virtual uint16_t get_log_msg_count(uint16_t log_num, uint8_t type) = 0;
+    virtual uint16_t get_log_msg_data(uint16_t log_num, uint8_t type, uint16_t index, uint8_t *data) = 0;
     virtual void LogReadProcess(uint16_t log_num,
                                 uint16_t start_page, uint16_t end_page, 
                                 void (*printMode)(AP_HAL::BetterStream *port, uint8_t mode),

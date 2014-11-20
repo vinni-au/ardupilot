@@ -9,6 +9,7 @@
 
 #include <AP_HAL.h>
 
+#define HAL_OS_POSIX_IO 1
 #if HAL_OS_POSIX_IO
 #include "DataFlash.h"
 #include <sys/stat.h>
@@ -395,6 +396,160 @@ uint16_t DataFlash_File::start_new_log(void)
     free(fname);
 
     return log_num;
+}
+
+/**
+ * Get message count of type in specific log
+ */
+uint16_t DataFlash_File::get_log_msg_count(uint16_t log_num, uint8_t type)
+{
+	uint16_t result = 0;
+    uint8_t log_step = 0;
+    uint16_t start_page, end_page;
+    if (!_initialised) {
+        return 0;
+    }
+    if (_read_fd != -1) {
+        ::close(_read_fd);
+        _read_fd = -1;
+    }
+    char *fname = _log_file_name(log_num);
+    if (fname == NULL) {
+        return 0;
+    }
+    _read_fd = ::open(fname, O_RDONLY);
+    free(fname);
+    if (_read_fd == -1) {
+        return 0;
+    }
+    _read_fd_log_num = log_num;
+    _read_offset = 0;
+    get_log_boundaries(log_num, start_page, end_page);
+    if (start_page != 0) {
+        ::lseek(_read_fd, start_page * DATAFLASH_PAGE_SIZE, SEEK_SET);
+    }
+
+    while (true) {
+        uint8_t b;
+        if (::read(_read_fd, &b, 1) != 1) {
+            // reached end of file
+            break;
+        }
+        _read_offset++;
+
+        // This is a state machine to read the packets
+        switch(log_step) {
+            case 0:
+                if (b == HEAD_BYTE1) {
+                    log_step++;
+                }
+                break;
+
+            case 1:
+                if (b == HEAD_BYTE2) {
+                    log_step++;
+                } else {
+                    log_step = 0;
+                }
+                break;
+
+            case 2:
+                log_step = 0;
+                if (b == type) {
+                	++result;
+                }
+                break;
+        }
+        if (_read_offset >= (end_page+1) * DATAFLASH_PAGE_SIZE) {
+            break;
+        }
+    }
+
+    ::close(_read_fd);
+    _read_fd = -1;
+	return result;
+}
+
+
+uint16_t DataFlash_File::get_log_msg_data(uint16_t log_num, uint8_t type, uint16_t index, uint8_t *data)
+{
+	uint16_t idx = 0;
+    uint8_t log_step = 0;
+    uint16_t start_page, end_page;
+    if (!_initialised) {
+        return 0;
+    }
+    if (_read_fd != -1) {
+        ::close(_read_fd);
+        _read_fd = -1;
+    }
+    char *fname = _log_file_name(log_num);
+    if (fname == NULL) {
+        return 0;
+    }
+    _read_fd = ::open(fname, O_RDONLY);
+    free(fname);
+    if (_read_fd == -1) {
+        return 0;
+    }
+    _read_fd_log_num = log_num;
+    _read_offset = 0;
+    get_log_boundaries(log_num, start_page, end_page);
+    if (start_page != 0) {
+        ::lseek(_read_fd, start_page * DATAFLASH_PAGE_SIZE, SEEK_SET);
+    }
+
+    while (true) {
+        uint8_t b;
+        if (::read(_read_fd, &b, 1) != 1) {
+            // reached end of file
+            break;
+        }
+        _read_offset++;
+
+        // This is a state machine to read the packets
+        switch(log_step) {
+            case 0:
+                if (b == HEAD_BYTE1) {
+                    log_step++;
+                }
+                break;
+
+            case 1:
+                if (b == HEAD_BYTE2) {
+                    log_step++;
+                } else {
+                    log_step = 0;
+                }
+                break;
+
+            case 2:
+                log_step = 0;
+                if (b == type) {
+                	++idx;
+                	if (idx == index) {
+    					//here it is! determine type to read certain amount of data
+    				    uint8_t i;
+    				    for (i=0; i<_num_types; i++) {
+    				        if (b == (_structures[i].msg_type)) {
+    				            break;
+    				        }
+    				    }
+    				    uint8_t msg_len = (_structures[i].msg_len) - 3;
+    					ReadBlock(data, msg_len);
+    					return msg_len;
+                	}
+                }
+                break;
+        }
+        if (_read_offset >= (end_page+1) * DATAFLASH_PAGE_SIZE) {
+            break;
+        }
+    }
+
+    ::close(_read_fd);
+    _read_fd = -1;
+	return 0;
 }
 
 /*

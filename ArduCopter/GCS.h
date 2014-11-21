@@ -163,6 +163,7 @@ public:
                   STREAM_EXTRA2,
                   STREAM_EXTRA3,
                   STREAM_PARAMS,
+                  STREAM_CAMERA_FEEDBACKS,
                   NUM_STREAMS};
 
     // see if we should send a stream now. Called at 50Hz
@@ -191,6 +192,21 @@ private:
                                                          // parameters for
                                                          // queued send
     uint32_t                    _queued_parameter_send_time_ms;
+
+#if CAMERA == ENABLED
+    bool						_cf_sending;
+    uint16_t					_cf_log;
+    uint16_t					_cf_log_page;
+    uint16_t					_cf_log_offset;
+    uint8_t                     _cf_buffer[90];
+    uint8_t                     _cf_buffer_offset;
+    uint8_t						_cf_buffer_size;
+    uint8_t                     _cf_cam_buffer[28];
+    uint8_t                     _cf_cam_buffer_size;
+    uint16_t                    _cf_cur_img_idx;
+    uint8_t                     _cf_b;
+    uint8_t                     _cf_step;
+#endif
 
     /// Count the number of reportable parameters.
     ///

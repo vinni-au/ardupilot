@@ -507,15 +507,6 @@ static void NOINLINE send_statustext(mavlink_channel_t chan)
 #if CAMERA == ENABLED
 static void NOINLINE send_camera_feedback(mavlink_channel_t chan)
 {
-    int32_t altitude, altitude_rel;
-    if (current_loc.options & 0b1) {
-        altitude = current_loc.alt+home.alt;
-        altitude_rel = current_loc.alt;
-    } else {
-        altitude = current_loc.alt;
-        altitude_rel = current_loc.alt - home.alt;
-    }
-
     mavlink_msg_camera_feedback_send(
 			chan, //chan
 			micros(), //time_usec
@@ -524,8 +515,8 @@ static void NOINLINE send_camera_feedback(mavlink_channel_t chan)
 			camera.photo_count() - 1,//img_idx
 			current_loc.lat, //lat
 			current_loc.lng,//lng
-			altitude*0.01f,//alt_msl
-			altitude_rel*0.01f,//alt_rel
+			current_loc.alt*0.01f,//alt_msl
+			current_loc.alt*0.01f,//alt_rel
 			degrees(ahrs.roll),//roll
 			degrees(ahrs.pitch),//pitch
 			degrees(ahrs.yaw),//yaw
@@ -867,6 +858,15 @@ const AP_Param::GroupInfo GCS_MAVLINK::var_info[] PROGMEM = {
     // @Increment: 1
     // @User: Advanced
     AP_GROUPINFO("PARAMS",   8, GCS_MAVLINK, streamRates[8],  0),
+
+    // @Param: CAM_FEED
+    // @DisplayName: Camera feedbacks stream rate to ground station
+    // @Description: Camera feedbacks stream rate to ground station
+    // @Units: Hz
+    // @Range: 0 10
+    // @Increment: 1
+    // @User: Advanced
+    AP_GROUPINFO("CAM_FEED", 9, GCS_MAVLINK, streamRates[9],  5),
     AP_GROUPEND
 };
 
@@ -1029,6 +1029,112 @@ GCS_MAVLINK::data_stream_send(void)
     if (in_mavlink_delay) {
         // don't send any other stream types while in the delay callback
         return;
+    }
+
+    if (_cf_sending && stream_trigger(STREAM_CAMERA_FEEDBACKS)) {
+    	//TODO: send next camera feedback
+    	if (_cf_log == 0) {
+    		// get log num
+    	    gcs_send_text_P(SEVERITY_MEDIUM, PSTR("STARTING CAM STREAM"));
+    		uint16_t logs_count = DataFlash.get_num_logs();
+    		if (logs_count == 0) {
+    			_cf_sending = false;
+    			return;
+    		}
+    		_cf_log = DataFlash.find_last_log();
+    		_cf_log_offset = 0;
+    		_cf_step = 0;
+    		_cf_cur_img_idx = 0;
+
+    		uint16_t end;
+    		DataFlash.get_log_boundaries(_cf_log, _cf_log_page, end);
+    	}
+
+    	// find next camera feedback and send it to gcs
+    	while (true) {
+    	    if (_cf_buffer_offset >= _cf_buffer_size) {
+    	        //read next chunk of data
+    	        _cf_log_offset += _cf_buffer_size;
+    	        _cf_buffer_size = DataFlash.get_log_data(_cf_log, _cf_log_page, _cf_log_offset, (uint32_t)90, &_cf_buffer[0]);
+    	        if (_cf_buffer_size == 0) {
+    	            _cf_sending = false;
+    	            return;
+    	        }
+    	        _cf_buffer_offset = 0;
+    	    }
+
+    	    _cf_b = _cf_buffer[_cf_buffer_offset++];
+    	    switch (_cf_step) {
+    	    case 0:
+                // waiting for head1
+    	        if (_cf_b == HEAD_BYTE1) {
+    	            _cf_step++;
+    	        }
+    	        break;
+    	    case 1:
+                // waiting for head2
+                if (_cf_b == HEAD_BYTE2) {
+                    _cf_step++;
+                }
+    	        break;
+    	    case 2:
+                // waiting for CAM
+    	        if (_cf_b == LOG_CAMERA_MSG) {
+    	            _cf_step++;
+    	            _cf_cam_buffer_size = 0;
+    	        } else {
+    	            _cf_step = 0;
+    	        }
+    	        break;
+    	        // collecting CAM
+    	    case 3:
+    	        if (_cf_cam_buffer_size == 24) {
+    	            //parse cam and send to gcs;
+    	            _cf_step = 0;
+    	            _cf_cam_buffer_size = 0;
+
+    	            uint8_t ofs = 0;
+
+#define decode_value(type, name) \
+type name;\
+memcpy(&name, &_cf_cam_buffer[ofs], sizeof(name));\
+ofs += sizeof(name);
+
+    	            decode_value(uint32_t, time_ms);
+                    decode_value(float, gpsTime);
+                    decode_value(uint16_t, gpsWeek);
+                    decode_value(int32_t, lat);
+                    decode_value(int32_t, lon);
+                    decode_value(int32_t, alt);
+                    decode_value(int16_t, roll);
+                    decode_value(int16_t, pitch);
+                    decode_value(uint16_t, yaw);
+
+ #undef decode_value
+
+                    mavlink_msg_camera_feedback_send(chan,
+                            time_ms, // time_usec
+                            g.sysid_my_gcs, // target_system
+                            0, // cam_idx
+                            _cf_cur_img_idx++, // img_idx
+                            lat, lon, // lat, lon
+                            alt*0.01f, alt*0.01f, // alt_msl, alt_rel
+                            roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
+                            0, 0);
+
+
+    	            return;
+    	        } else {
+    	            _cf_cam_buffer[_cf_cam_buffer_size++] = _cf_b;
+    	        }
+    	        break;
+    	    }
+
+    	}
+
+
+    	// don't send any other stream types while in camera feedback sending
+    	return;
     }
 
     if (stream_trigger(STREAM_RAW_SENSORS)) {
@@ -2018,38 +2124,46 @@ mission_failed:
     	mavlink_camera_feedback_request_t packet;
     	mavlink_msg_camera_feedback_request_decode(msg, &packet);
 
-    	uint16_t last_log_num = DataFlash.find_last_log();
-    	uint8_t data[90];
-    	uint16_t indx = 0;
-    	uint16_t len = DataFlash.get_log_msg_data(last_log_num, LOG_CAMERA_MSG, packet.img_idx, data);
-    	if (len > 0) {
-    		int ofs = 0;
-    		// IHLLeccC
+    	if (packet.img_idx < 0) {
+    		// send all feedbacks (without specific requests) stream-like
+    		_cf_sending = true;
+
+    	} else {
+    		if (_cf_sending) {
+    			break;
+    		}
+			uint16_t last_log_num = DataFlash.find_last_log();
+			uint8_t data[90];
+			uint16_t len = DataFlash.get_log_msg_data(last_log_num, LOG_CAMERA_MSG, packet.img_idx, data);
+			if (len > 0) {
+				int ofs = 0;
+				// IHLLeccC
 #define decode_value(type, name) \
 type name;\
 memcpy(&name, &data[ofs], sizeof(name));\
 ofs += sizeof(name);
 
-    		decode_value(float, gpsTime);
-    		decode_value(uint16_t, gpsWeek);
-    		decode_value(int32_t, lat);
-    		decode_value(int32_t, lon);
-    		decode_value(int32_t, alt);
-    		decode_value(int16_t, roll);
-    		decode_value(int16_t, pitch);
-    		decode_value(uint16_t, yaw);
+				decode_value(float, gpsTime);
+				decode_value(uint16_t, gpsWeek);
+				decode_value(int32_t, lat);
+				decode_value(int32_t, lon);
+				decode_value(int32_t, alt);
+				decode_value(int16_t, roll);
+				decode_value(int16_t, pitch);
+				decode_value(uint16_t, yaw);
 
  #undef decode_value
 
-    		mavlink_msg_camera_feedback_send(chan,
-    				0, // time_usec
-    				g.sysid_my_gcs, // target_system
-    				0, // cam_idx
-    				packet.img_idx, // img_idx
-    				lat, lon, // lat, lon
-    				alt*0.01f, alt*0.01f, // alt_msl, alt_rel
-    				roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
-    				0, 0);
+				mavlink_msg_camera_feedback_send(chan,
+						0, // time_usec
+						g.sysid_my_gcs, // target_system
+						0, // cam_idx
+						packet.img_idx, // img_idx
+						lat, lon, // lat, lon
+						alt*0.01f, alt*0.01f, // alt_msl, alt_rel
+						roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
+						0, 0);
+			}
     	}
     	break;
     }

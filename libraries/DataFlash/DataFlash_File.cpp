@@ -9,7 +9,6 @@
 
 #include <AP_HAL.h>
 
-#define HAL_OS_POSIX_IO 1
 #if HAL_OS_POSIX_IO
 #include "DataFlash.h"
 #include <sys/stat.h>

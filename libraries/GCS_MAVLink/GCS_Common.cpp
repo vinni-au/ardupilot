@@ -23,8 +23,13 @@ extern const AP_HAL::HAL& hal;
 
 GCS_MAVLINK::GCS_MAVLINK() :
     waypoint_receive_timeout(1000)
+#if CAMERA == ENABLED
+	, _cf_sending(false)
+	, _cf_log(0)
+#endif
 {
     AP_Param::setup_object_defaults(this, var_info);
+
 }
 
 void

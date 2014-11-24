@@ -419,6 +419,7 @@ void DataFlash_Block::_print_log_formats(uint8_t num_types,
 /**
  *
  */
+#if 0
 uint16_t DataFlash_Block::get_log_msg_count(uint16_t log_num, uint8_t type)
 {
 	uint8_t log_step = 0;
@@ -530,6 +531,7 @@ uint16_t DataFlash_Block::get_log_msg_data(uint16_t log_num, uint8_t type, uint1
 
 	return 0;
 }
+#endif
 
 /*
   Read the log and print it on port

@@ -1031,111 +1031,111 @@ GCS_MAVLINK::data_stream_send(void)
         return;
     }
 
-    if (_cf_sending && stream_trigger(STREAM_CAMERA_FEEDBACKS)) {
-    	//TODO: send next camera feedback
-    	if (_cf_log == 0) {
-    		// get log num
-    	    gcs_send_text_P(SEVERITY_MEDIUM, PSTR("STARTING CAM STREAM"));
-    		uint16_t logs_count = DataFlash.get_num_logs();
-    		if (logs_count == 0) {
-    			_cf_sending = false;
-    			return;
-    		}
-    		_cf_log = DataFlash.find_last_log();
-    		_cf_log_offset = 0;
-    		_cf_step = 0;
-    		_cf_cur_img_idx = 0;
-
-    		uint16_t end;
-    		DataFlash.get_log_boundaries(_cf_log, _cf_log_page, end);
-    	}
-
-    	// find next camera feedback and send it to gcs
-    	while (true) {
-    	    if (_cf_buffer_offset >= _cf_buffer_size) {
-    	        //read next chunk of data
-    	        _cf_log_offset += _cf_buffer_size;
-    	        _cf_buffer_size = DataFlash.get_log_data(_cf_log, _cf_log_page, _cf_log_offset, (uint32_t)90, &_cf_buffer[0]);
-    	        if (_cf_buffer_size == 0) {
-    	            _cf_sending = false;
-    	            return;
-    	        }
-    	        _cf_buffer_offset = 0;
-    	    }
-
-    	    _cf_b = _cf_buffer[_cf_buffer_offset++];
-    	    switch (_cf_step) {
-    	    case 0:
-                // waiting for head1
-    	        if (_cf_b == HEAD_BYTE1) {
-    	            _cf_step++;
-    	        }
-    	        break;
-    	    case 1:
-                // waiting for head2
-                if (_cf_b == HEAD_BYTE2) {
-                    _cf_step++;
-                }
-    	        break;
-    	    case 2:
-                // waiting for CAM
-    	        if (_cf_b == LOG_CAMERA_MSG) {
-    	            _cf_step++;
-    	            _cf_cam_buffer_size = 0;
-    	        } else {
-    	            _cf_step = 0;
-    	        }
-    	        break;
-    	        // collecting CAM
-    	    case 3:
-    	        if (_cf_cam_buffer_size == 24) {
-    	            //parse cam and send to gcs;
-    	            _cf_step = 0;
-    	            _cf_cam_buffer_size = 0;
-
-    	            uint8_t ofs = 0;
-
-#define decode_value(type, name) \
-type name;\
-memcpy(&name, &_cf_cam_buffer[ofs], sizeof(name));\
-ofs += sizeof(name);
-
-    	            decode_value(uint32_t, time_ms);
-                    decode_value(float, gpsTime);
-                    decode_value(uint16_t, gpsWeek);
-                    decode_value(int32_t, lat);
-                    decode_value(int32_t, lon);
-                    decode_value(int32_t, alt);
-                    decode_value(int16_t, roll);
-                    decode_value(int16_t, pitch);
-                    decode_value(uint16_t, yaw);
-
- #undef decode_value
-
-                    mavlink_msg_camera_feedback_send(chan,
-                            time_ms, // time_usec
-                            g.sysid_my_gcs, // target_system
-                            0, // cam_idx
-                            _cf_cur_img_idx++, // img_idx
-                            lat, lon, // lat, lon
-                            alt*0.01f, alt*0.01f, // alt_msl, alt_rel
-                            roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
-                            0, 0);
-
-
-    	            return;
-    	        } else {
-    	            _cf_cam_buffer[_cf_cam_buffer_size++] = _cf_b;
-    	        }
-    	        break;
-    	    }
-
-    	}
-
-
-    	// don't send any other stream types while in camera feedback sending
-    	return;
-    }
+//    if (_cf_sending && stream_trigger(STREAM_CAMERA_FEEDBACKS)) {
+//    	//TODO: send next camera feedback
+//    	if (_cf_log == 0) {
+//    		// get log num
+//    	    gcs_send_text_P(SEVERITY_MEDIUM, PSTR("STARTING CAM STREAM"));
+//    		uint16_t logs_count = DataFlash.get_num_logs();
+//    		if (logs_count == 0) {
+//    			_cf_sending = false;
+//    			return;
+//    		}
+//    		_cf_log = DataFlash.find_last_log();
+//    		_cf_log_offset = 0;
+//    		_cf_step = 0;
+//    		_cf_cur_img_idx = 0;
+//
+//    		uint16_t end;
+//    		DataFlash.get_log_boundaries(_cf_log, _cf_log_page, end);
+//    	}
+//
+//    	// find next camera feedback and send it to gcs
+//    	while (true) {
+//    	    if (_cf_buffer_offset >= _cf_buffer_size) {
+//    	        //read next chunk of data
+//    	        _cf_log_offset += _cf_buffer_size;
+//    	        _cf_buffer_size = DataFlash.get_log_data(_cf_log, _cf_log_page, _cf_log_offset, (uint32_t)90, &_cf_buffer[0]);
+//    	        if (_cf_buffer_size == 0) {
+//    	            _cf_sending = false;
+//    	            return;
+//    	        }
+//    	        _cf_buffer_offset = 0;
+//    	    }
+//
+//    	    _cf_b = _cf_buffer[_cf_buffer_offset++];
+//    	    switch (_cf_step) {
+//    	    case 0:
+//                // waiting for head1
+//    	        if (_cf_b == HEAD_BYTE1) {
+//    	            _cf_step++;
+//    	        }
+//    	        break;
+//    	    case 1:
+//                // waiting for head2
+//                if (_cf_b == HEAD_BYTE2) {
+//                    _cf_step++;
+//                }
+//    	        break;
+//    	    case 2:
+//                // waiting for CAM
+//    	        if (_cf_b == LOG_CAMERA_MSG) {
+//    	            _cf_step++;
+//    	            _cf_cam_buffer_size = 0;
+//    	        } else {
+//    	            _cf_step = 0;
+//    	        }
+//    	        break;
+//    	        // collecting CAM
+//    	    case 3:
+//    	        if (_cf_cam_buffer_size == 24) {
+//    	            //parse cam and send to gcs;
+//    	            _cf_step = 0;
+//    	            _cf_cam_buffer_size = 0;
+//
+//    	            uint8_t ofs = 0;
+//
+//#define decode_value(type, name) \
+//type name;\
+//memcpy(&name, &_cf_cam_buffer[ofs], sizeof(name));\
+//ofs += sizeof(name);
+//
+//    	            decode_value(uint32_t, time_ms);
+//                    decode_value(float, gpsTime);
+//                    decode_value(uint16_t, gpsWeek);
+//                    decode_value(int32_t, lat);
+//                    decode_value(int32_t, lon);
+//                    decode_value(int32_t, alt);
+//                    decode_value(int16_t, roll);
+//                    decode_value(int16_t, pitch);
+//                    decode_value(uint16_t, yaw);
+//
+// #undef decode_value
+//
+//                    mavlink_msg_camera_feedback_send(chan,
+//                            time_ms, // time_usec
+//                            g.sysid_my_gcs, // target_system
+//                            0, // cam_idx
+//                            _cf_cur_img_idx++, // img_idx
+//                            lat, lon, // lat, lon
+//                            alt*0.01f, alt*0.01f, // alt_msl, alt_rel
+//                            roll*0.01f, pitch*0.01f, yaw*0.01f, //roll pitch yaw
+//                            0, 0);
+//
+//
+//    	            return;
+//    	        } else {
+//    	            _cf_cam_buffer[_cf_cam_buffer_size++] = _cf_b;
+//    	        }
+//    	        break;
+//    	    }
+//
+//    	}
+//
+//
+//    	// don't send any other stream types while in camera feedback sending
+//    	return;
+//    }
 
     if (stream_trigger(STREAM_RAW_SENSORS)) {
         send_message(MSG_RAW_IMU1);
@@ -2100,6 +2100,7 @@ mission_failed:
         break;
     }
 
+#if 0
     case MAVLINK_MSG_ID_CAMERA_FEEDBACK_REQUEST_LIST:
     {
     	uint16_t logs_count = DataFlash.get_num_logs();
@@ -2167,6 +2168,7 @@ ofs += sizeof(name);
     	}
     	break;
     }
+#endif
 #endif // CAMERA == ENABLED
 
 #if MOUNT == ENABLED
@@ -2215,9 +2217,9 @@ ofs += sizeof(name);
 
     //XXX
     case MAVLINK_MSG_ID_LOG_REQUEST_LIST ... MAVLINK_MSG_ID_LOG_REQUEST_END:
-        if (!in_mavlink_delay && !motors.armed()) {
-            handle_log_message(msg, DataFlash);
-        }
+//        if (!in_mavlink_delay && !motors.armed()) {
+//            handle_log_message(msg, DataFlash);
+//        }
         break;    
 
 /* To-Do: add back support for polygon type fence

@@ -94,6 +94,9 @@ public:
     bool                armed() const { return _flags.armed; };
     void                armed(bool arm);
 
+    bool                prearmed() { return _flags.prearmed; };
+    void                prearmed(bool prearm);
+
     // set_min_throttle - sets the minimum throttle that will be sent to the engines when they're not off (i.e. to prevents issues with some motors spinning and some not at very low throttle)
     void                set_min_throttle(uint16_t min_throttle);
     // set_mid_throttle - sets the mid throttle which is close to the hover throttle of the copter
@@ -157,6 +160,7 @@ protected:
     // output functions that should be overloaded by child classes
     virtual void        output_armed() {};
     virtual void        output_disarmed() {};
+    virtual void        output_prearmed() {};
 
     // update_max_throttle - updates the limits on _max_throttle if necessary taking into account slow_start_throttle flag
     void                update_max_throttle();
@@ -164,6 +168,7 @@ protected:
     // flag bitmask
     struct AP_Motors_flags {
         uint8_t armed               : 1;    // 1 if the motors are armed, 0 if disarmed
+        uint8_t prearmed            : 1;    // 1 if the motors are pre-armed
         uint8_t frame_orientation   : 4;    // PLUS_FRAME 0, X_FRAME 1, V_FRAME 2, H_FRAME 3, NEW_PLUS_FRAME 10, NEW_X_FRAME, NEW_V_FRAME, NEW_H_FRAME
         uint8_t slow_start          : 1;    // 1 if slow start is active
         uint8_t slow_start_low_end  : 1;    // 1 just after arming so we can ramp up the spin_when_armed value
@@ -189,5 +194,10 @@ protected:
     int16_t             _max_throttle;          // the maximum throttle to be sent to the motors (sometimes limited by slow start)
     int16_t             _hover_out;             // the estimated hover throttle in pwm (i.e. 1000 ~ 2000).  calculated from the THR_MID parameter
     int16_t             _spin_when_armed_ramped;// equal to _spin_when_armed parameter but slowly ramped up from zero
+
+    // vars for prearm
+    bool                _prearm_mot_enabled[AP_MOTORS_MAX_NUM_MOTORS];
+    uint32_t            _prearm_start_time;
+    uint16_t            _prearm_last_motor;
 };
 #endif  // __AP_MOTORS_CLASS_H__

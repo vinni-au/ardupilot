@@ -104,6 +104,27 @@ void AP_Motors::armed(bool arm)
     AP_Notify::flags.armed = arm;
 };
 
+void AP_Motors::prearmed(bool prearm)
+{
+    _flags.prearmed = prearm;
+    // хардкод для квадрокоптера,
+    // почему-то правильный алгоритм с копированием значений из motor_enabled[] теряет 4й мотор
+    _prearm_last_motor = 3;
+    _prearm_mot_enabled[0] = true;
+    _prearm_mot_enabled[1] = true;
+    _prearm_mot_enabled[2] = true;
+    _prearm_mot_enabled[3] = true;
+    _prearm_mot_enabled[4] = false;
+    for (int16_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; ++i) {
+//        _prearm_mot_enabled[i] = motor_enabled[i];
+        motor_enabled[i] = false;
+//        if (_prearm_mot_enabled[i]) {
+//            _prearm_last_motor = i;
+//        }
+    }
+    _prearm_start_time = 0;
+}
+
 // set_min_throttle - sets the minimum throttle that will be sent to the engines when they're not off (i.e. to prevents issues with some motors spinning and some not at very low throttle)
 void AP_Motors::set_min_throttle(uint16_t min_throttle)
 {
@@ -137,7 +158,21 @@ void AP_Motors::output()
     update_max_throttle();
 
     // output to motors
-    if (_flags.armed ) {
+    if (_flags.prearmed) {
+        if (_prearm_start_time == 0) {
+            _prearm_start_time = hal.scheduler->millis();
+        }
+        uint32_t time = hal.scheduler->millis() - _prearm_start_time;
+        uint16_t index = time / 1000;
+        for (uint16_t i = 0; i <= index; ++i) {
+            motor_enabled[i] = _prearm_mot_enabled[i];
+        }
+        output_armed();
+        if (index > _prearm_last_motor) {
+            // we're done
+            _flags.prearmed = false;
+        }
+    } else if (_flags.armed ) {
         output_armed();
     }else{
         output_disarmed();

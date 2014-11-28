@@ -205,6 +205,8 @@ static bool init_arm_motors()
     // enable output to motors
     output_min();
 
+    // run the prearm procedure
+    motors.prearmed(true);
     // finally actually arm the motors
     motors.armed(true);
 

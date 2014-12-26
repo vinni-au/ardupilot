@@ -426,6 +426,13 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(angle_rate_max, "ANGLE_RATE_MAX",  ANGLE_RATE_MAX),
 
+    // @Param: MOTORS_ALTERNATE_START
+    // @DisplayName: Start motors consequently
+    // @Description: Enables consequent motors starting
+    // @Values: 0:Disabled, 1:Enabled
+    // @User: Advanced
+    GSCALAR(motors_alternate_start, "MOTORS_ALT_START", MOTORS_ALTERNATE_START_DEFAULT),
+
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_
     // @Path: ../libraries/RC_Channel/RC_Channel.cpp

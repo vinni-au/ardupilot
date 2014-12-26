@@ -124,7 +124,7 @@ public:
         // 90: Motors
         //
         k_param_motors = 90,
-
+        k_param_motors_alternate_start,
         //
         // 100: Inertial Nav
         //
@@ -310,6 +310,8 @@ public:
     AP_Int16        rtl_alt_final;
     AP_Int8         copter_leds_mode;           // Operating mode of LED
                                                 // lighting system
+    // Motors
+    AP_Int8         motors_alternate_start;     // start motors consequently
 
     AP_Int8         rssi_pin;
     AP_Int8         wp_yaw_behavior;            // controls how the autopilot controls yaw during missions

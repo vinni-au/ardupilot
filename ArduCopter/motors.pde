@@ -208,8 +208,10 @@ static void init_arm_motors()
     // enable output to motors
     output_min();
 
-    // run the prearm procedure
-    motors.prearmed(true);
+    // run the prearm procedure depending on MOTORS_ALT_START parameter
+    if (g.motors_alternate_start.get() > 0) {
+        motors.prearmed(true);
+    }
     // finally actually arm the motors
     motors.armed(true);
 

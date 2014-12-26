@@ -1082,6 +1082,11 @@
   #  define CLI_ENABLED           ENABLED
 #endif
 
+
+#ifndef MOTORS_ALTERNATE_START_DEFAULT
+    #define MOTORS_ALTERNATE_START_DEFAULT 1
+#endif
+
 /*
   build a firmware version string.
   GIT_VERSION comes from Makefile builds

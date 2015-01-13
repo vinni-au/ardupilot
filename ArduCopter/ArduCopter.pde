@@ -780,6 +780,11 @@ static AP_InertialNav inertial_nav(&ahrs, &barometer, g_gps, gps_glitch);
 static AC_WPNav wp_nav(&inertial_nav, &ahrs, &g.pi_loiter_lat, &g.pi_loiter_lon, &g.pid_loiter_rate_lat, &g.pid_loiter_rate_lon);
 
 ////////////////////////////////////////////////////////////////////////////////
+// Counting flights
+////////////////////////////////////////////////////////////////////////////////
+static bool need_flight_count_inc = false;
+
+////////////////////////////////////////////////////////////////////////////////
 // Performance monitoring
 ////////////////////////////////////////////////////////////////////////////////
 static int16_t pmTest1;
@@ -2126,6 +2131,7 @@ static void update_trig(void){
 // read baro and sonar altitude at 20hz
 static void update_altitude()
 {
+    int32_t old_baro_alt = baro_alt;
 #if HIL_MODE == HIL_MODE_ATTITUDE
     // we are in the SIM, fake out the baro and Sonar
     baro_alt                = g_gps->altitude_cm;
@@ -2144,6 +2150,12 @@ static void update_altitude()
     // write altitude info to dataflash logs
     if ((g.log_bitmask & MASK_LOG_CTUN) && motors.armed()) {
         Log_Write_Control_Tuning();
+    }
+
+    // check if we need to count this flight
+    if (need_flight_count_inc && old_baro_alt < 2500 && baro_alt >= 2500) {
+        g.flight_count.set_and_save(g.flight_count.get() + 1);
+        need_flight_count_inc = false;
     }
 }
 

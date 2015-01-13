@@ -433,6 +433,12 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(motors_alternate_start, "MOTORS_ALT_START", MOTORS_ALTERNATE_START_DEFAULT),
 
+    // @Param: FLIGHT_COUNT
+    // @DisplayName: Number of flights
+    // @Description: Total number of performed flights
+    // @User: Advanced
+    GSCALAR(flight_count, "FLIGHT_COUNT", FLIGHT_COUNT_DEFAULT),
+
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_
     // @Path: ../libraries/RC_Channel/RC_Channel.cpp

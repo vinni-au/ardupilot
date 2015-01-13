@@ -1801,7 +1801,8 @@ mission_failed:
         vp = AP_Param::find(key, &var_type);
         if ((NULL != vp) &&                                                                                     // exists
             !isnan(packet.param_value) &&                                                  // not nan
-            !isinf(packet.param_value)) {                                                  // not inf
+            !isinf(packet.param_value) &&                                                   // not inf
+            strcmp(key, "FLIGHT_COUNT")) {                                                 // not special parameter
 
             // add a small amount before casting parameter values
             // from float to integer to avoid truncating to the

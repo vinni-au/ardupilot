@@ -220,6 +220,8 @@ static void init_arm_motors()
 
     // reenable failsafe
     failsafe_enable();
+
+    need_flight_count_inc = true;
 }
 
 // perform pre-arm checks and set ap.pre_arm_check flag
@@ -513,6 +515,8 @@ static void init_disarm_motors()
 
     // disable gps velocity based centrefugal force compensation
     ahrs.set_correct_centrifugal(false);
+
+    need_flight_count_inc = false;
 }
 
 /*****************************************

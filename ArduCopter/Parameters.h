@@ -89,7 +89,8 @@ public:
         k_param_gps_hdop_good,
         k_param_battery,
         k_param_fs_batt_mah,
-        k_param_angle_rate_max,         // 38
+        k_param_angle_rate_max,
+        k_param_flight_count,            // 39
 
         // 65: AP_Limits Library
         k_param_limits = 65,            // deprecated - remove
@@ -359,6 +360,7 @@ public:
     AP_Int8         ch7_option;
     AP_Int8         ch8_option;
     AP_Int8         arming_check_enabled;
+    AP_Int32        flight_count;
 
 #if FRAME_CONFIG ==     HELI_FRAME
     // Heli

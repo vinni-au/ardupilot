@@ -102,6 +102,7 @@ public:
         k_param_battery,
         k_param_fs_batt_mah,
         k_param_angle_rate_max,         // remove
+        k_param_flight_count,
         k_param_rssi_range,
         k_param_rc_feel_rp,
         k_param_NavEKF,                 // Extended Kalman Filter Inertial Navigation Group
@@ -357,6 +358,8 @@ public:
     AP_Int16        poshold_brake_rate;         // PosHold flight mode's rotation rate during braking in deg/sec
     AP_Int16        poshold_brake_angle_max;    // PosHold flight mode's max lean angle during braking in centi-degrees
     
+    AP_Int32        flight_count;
+
     // Waypoints
     //
     AP_Int32        rtl_loiter_time;

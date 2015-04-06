@@ -648,6 +648,11 @@ static AC_WPNav wp_nav(inertial_nav, ahrs, pos_control);
 static AC_Circle circle_nav(inertial_nav, ahrs, pos_control);
 
 ////////////////////////////////////////////////////////////////////////////////
+// Counting flights
+////////////////////////////////////////////////////////////////////////////////
+static bool need_flight_count_inc = false;
+
+////////////////////////////////////////////////////////////////////////////////
 // Performance monitoring
 ////////////////////////////////////////////////////////////////////////////////
 static int16_t pmTest1;
@@ -1390,6 +1395,7 @@ static void read_AHRS(void)
 // read baro and sonar altitude at 10hz
 static void update_altitude()
 {
+    int32_t old_baro = baro_alt;
     // read in baro altitude
     read_barometer();
 
@@ -1399,6 +1405,11 @@ static void update_altitude()
     // write altitude info to dataflash logs
     if (should_log(MASK_LOG_CTUN)) {
         Log_Write_Control_Tuning();
+    }
+
+    if (need_flight_count_inc && old_baro < 2500 && baro_alt >= 2500) {
+        g.flight_count.set_and_save(g.flight_count.get() + 1);
+        need_flight_count_inc = false;
     }
 }
 

@@ -832,6 +832,10 @@
     #define MOTORS_ALTERNATE_START_DEFAULT 1
 #endif
 
+#ifndef FLIGHT_COUNT_DEFAULT
+    #define FLIGHT_COUNT_DEFAULT    0
+#endif
+
 /*
   build a firmware version string.
   GIT_VERSION comes from Makefile builds

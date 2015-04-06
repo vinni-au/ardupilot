@@ -224,6 +224,8 @@ static bool init_arm_motors()
     // flag exiting this function
     in_arm_motors = false;
 
+    need_flight_count_inc = true;
+
     // return success
     return true;
 }
@@ -704,6 +706,8 @@ static void init_disarm_motors()
     // disable gps velocity based centrefugal force compensation
     ahrs.set_correct_centrifugal(false);
     ahrs.set_armed(false);
+
+    need_flight_count_inc = false;
 }
 
 /*****************************************

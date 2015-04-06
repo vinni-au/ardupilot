@@ -108,7 +108,7 @@ static NOINLINE void send_heartbeat(mavlink_channel_t chan)
 #else
   #error Unrecognised frame type
 #endif
-        MAV_AUTOPILOT_ARDUPILOTMEGA,
+        MAV_AUTOPILOT_ARDUPILOTMEGA, // 17
         base_mode,
         custom_mode,
         system_status);
@@ -1160,7 +1160,7 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
                 pre_arm_checks(true);
                 if(ap.pre_arm_check && arm_checks(true, true)) {
                     if (init_arm_motors()) {
-                    result = MAV_RESULT_ACCEPTED;
+                        result = MAV_RESULT_ACCEPTED;
                     } else {
                         AP_Notify::flags.arming_failed = true;  // init_arm_motors function will reset flag back to false
                         result = MAV_RESULT_UNSUPPORTED;

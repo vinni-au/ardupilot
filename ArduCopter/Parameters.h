@@ -159,6 +159,7 @@ public:
         // 90: Motors
         //
         k_param_motors = 90,
+        k_param_motors_alternate_start,
 
         //
         // 100: Inertial Nav
@@ -345,6 +346,8 @@ public:
     AP_Int8         optflow_enabled;
     AP_Int8         super_simple;
     AP_Int16        rtl_alt_final;
+
+    AP_Int8         motors_alternate_start;     // Start motors consequently
 
     AP_Int8         rssi_pin;
     AP_Float        rssi_range;                 // allows to set max voltage for rssi pin such as 5.0, 3.3 etc. 

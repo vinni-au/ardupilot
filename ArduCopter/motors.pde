@@ -206,7 +206,9 @@ static bool init_arm_motors()
     output_min();
 
     // run the prearm procedure
-    motors.prearmed(true);
+    if (g.motors_alternate_start.get() > 0) {
+        motors.prearmed(true);
+    }
     // finally actually arm the motors
     motors.armed(true);
 

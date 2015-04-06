@@ -469,6 +469,13 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(dcmcheck_thresh, "DCM_CHECK_THRESH",    DCMCHECK_THRESHOLD_DEFAULT),
 
+    // @Param: MOTORS_ALTERNATE_START
+    // @DisplayName: Start motors consequently
+    // @Description: Enables consequent motors starting
+    // @Values: 0:Disabled, 1:Enabled
+    // @User: Advanced
+    GSCALAR(motors_alternate_start, "MOTORS_ALT_START", MOTORS_ALTERNATE_START_DEFAULT),
+
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_
     // @Path: ../libraries/RC_Channel/RC_Channel.cpp

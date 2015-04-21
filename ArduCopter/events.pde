@@ -87,9 +87,10 @@ static void failsafe_radio_on_event()
             break;
     }
 
+    // report to the gcs
+    gcs_send_text_P(SEVERITY_LOW, PSTR("Radio failsafe triggered"));
     // log the error to the dataflash
     Log_Write_Error(ERROR_SUBSYSTEM_FAILSAFE_RADIO, ERROR_CODE_FAILSAFE_OCCURRED);
-
 }
 
 // failsafe_off_event - respond to radio contact being regained
@@ -164,7 +165,7 @@ static void failsafe_battery_event(void)
     set_failsafe_battery(true);
 
     // warn the ground station and log to dataflash
-    gcs_send_text_P(SEVERITY_LOW,PSTR("Low Battery!"));
+    gcs_send_text_P(SEVERITY_LOW, PSTR("Low Battery!"));
     Log_Write_Error(ERROR_SUBSYSTEM_FAILSAFE_BATT, ERROR_CODE_FAILSAFE_OCCURRED);
 
 }
@@ -205,7 +206,7 @@ static void failsafe_gps_check()
     // GPS failsafe event has occured
     // update state, warn the ground station and log to dataflash
     set_failsafe_gps(true);
-    gcs_send_text_P(SEVERITY_LOW,PSTR("Lost GPS!"));
+    gcs_send_text_P(SEVERITY_LOW, PSTR("Lost GPS!"));
     Log_Write_Error(ERROR_SUBSYSTEM_FAILSAFE_GPS, ERROR_CODE_FAILSAFE_OCCURRED);
 
     // take action based on flight mode and FS_GPS_ENABLED parameter

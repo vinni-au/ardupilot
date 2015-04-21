@@ -469,12 +469,18 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(dcmcheck_thresh, "DCM_CHECK_THRESH",    DCMCHECK_THRESHOLD_DEFAULT),
 
-    // @Param: MOTORS_ALTERNATE_START
+    // @Param: MOTOR_ALT_START
     // @DisplayName: Start motors consequently
     // @Description: Enables consequent motors starting
     // @Values: 0:Disabled, 1:Enabled
     // @User: Advanced
-    GSCALAR(motors_alternate_start, "MOTORS_ALT_START", MOTORS_ALTERNATE_START_DEFAULT),
+    GSCALAR(motors_alternate_start, "MOTOR_ALT_START", MOTORS_ALTERNATE_START_DEFAULT),
+
+    // @Param: MOTOR_DISARM_DEL
+    // @DisplayName: Auto disarm delay
+    // @Description: Delay in seconds before auto disarm in case of sitting on the ground doing nothing
+    // @User: Advanced
+    GSCALAR(motors_auto_disarm_delay, "MOTOR_DISARM_DEL",MOTORS_AUTO_DISARM_DELAY_DEFAULT),
 
     // @Param: FLIGHT_COUNT
     // @DisplayName: Number of flights

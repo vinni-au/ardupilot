@@ -3,7 +3,6 @@
 #define ARM_DELAY               20  // called at 10hz so 2 seconds
 #define DISARM_DELAY            20  // called at 10hz so 2 seconds
 #define AUTO_TRIM_DELAY         100 // called at 10hz so 10 seconds
-#define AUTO_DISARMING_DELAY    15  // called at 1hz so 15 seconds
 
 static uint8_t auto_disarming_counter;
 
@@ -91,7 +90,7 @@ static void auto_disarm_check()
     if (manual_flight_mode(control_mode) || ap.land_complete) {
         auto_disarming_counter++;
 
-        if(auto_disarming_counter >= AUTO_DISARMING_DELAY) {
+        if(auto_disarming_counter >= g.motors_auto_disarm_delay.get()) {
             init_disarm_motors();
             auto_disarming_counter = 0;
         }

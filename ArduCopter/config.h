@@ -836,6 +836,10 @@
     #define FLIGHT_COUNT_DEFAULT    0
 #endif
 
+#ifndef MOTORS_AUTO_DISARM_DELAY_DEFAULT
+    #define MOTORS_AUTO_DISARM_DELAY_DEFAULT    30
+#endif
+
 /*
   build a firmware version string.
   GIT_VERSION comes from Makefile builds

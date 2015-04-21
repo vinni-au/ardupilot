@@ -36,7 +36,7 @@
 
 #define AP_MISSION_FIRST_REAL_COMMAND       1       // command #0 reserved to hold home position
 
-#define AP_MISSION_RESTART_DEFAULT          0       // resume the mission from the last command run by default
+#define AP_MISSION_RESTART_DEFAULT          1       // resume the mission from the first command by default
 
 /// @class    AP_Mission
 /// @brief    Object managing Mission

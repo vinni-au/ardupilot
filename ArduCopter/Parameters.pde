@@ -488,6 +488,12 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(flight_count, "FLIGHT_COUNT", FLIGHT_COUNT_DEFAULT),
 
+    // @Param: FS_GCS_CLEARRC
+    // @DisplayName: Clear RC on FS_GCS
+    // @Description: Clear RC overrides on GCS failsafe
+    // @User: Advanced
+    GSCALAR(fs_gcs_clear_rc, "FS_GCS_CLEARRC", FS_GCS_CLEARRC_DEFAULT),
+
 
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_

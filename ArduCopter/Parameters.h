@@ -243,7 +243,7 @@ public:
         k_param_rc_8,
         k_param_rc_10,
         k_param_rc_11,
-        k_param_throttle_min,
+        k_param_throttle_min, // 180
         k_param_throttle_max,
         k_param_failsafe_throttle,
         k_param_throttle_fs_action,     // remove
@@ -253,6 +253,7 @@ public:
         k_param_radio_tuning,
         k_param_radio_tuning_high,
         k_param_radio_tuning_low,
+        k_param_fs_gcs_clear_rc, // 190
         k_param_rc_speed = 192,
         k_param_failsafe_battery_enabled,
         k_param_throttle_mid,
@@ -400,6 +401,7 @@ public:
     AP_Int8         ch7_option;
     AP_Int8         ch8_option;
     AP_Int8         arming_check;
+    AP_Int8         fs_gcs_clear_rc;
 
     AP_Int8         land_repositioning;
     AP_Float        ekfcheck_thresh;

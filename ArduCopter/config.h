@@ -844,6 +844,10 @@
     #define FS_GCS_CLEARRC_DEFAULT 0
 #endif
 
+#ifndef EKF_FS_LAND_DEFAULT
+    #define EKF_FS_LAND_DEFAULT 0
+#endif
+
 /*
   build a firmware version string.
   GIT_VERSION comes from Makefile builds

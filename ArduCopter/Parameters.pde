@@ -494,9 +494,6 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(fs_gcs_clear_rc, "FS_GCS_CLEARRC", FS_GCS_CLEARRC_DEFAULT),
 
-    //
-    GSCALAR(ekf_fs_land, "EKF_FS_LAND", EKF_FS_LAND_DEFAULT),
-
 
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_

@@ -153,21 +153,13 @@ static void failsafe_ekf_event()
     Log_Write_Error(ERROR_SUBSYSTEM_FAILSAFE_EKFINAV, ERROR_CODE_FAILSAFE_OCCURRED);
 
     // take action based on flight mode
-    if (g.fs_gcs_clear_rc.get() > 0) {
-        if (mode_requires_GPS(control_mode)) {
-            set_mode_land_with_pause();
-        }
+    if (mode_requires_GPS(control_mode)) {
+        set_mode_land_with_pause();
+    }
 
-        // if flight mode is LAND ensure it's not the GPS controlled LAND
-        if (control_mode == LAND) {
-            land_do_not_use_GPS();
-        }
-    } else {
-        if (mode_requires_GPS(control_mode)) {
-            if (!set_mode(RTL)) {
-                set_mode_land_with_pause();
-            }
-        }
+    // if flight mode is LAND ensure it's not the GPS controlled LAND
+    if (control_mode == LAND) {
+        land_do_not_use_GPS();
     }
 }
 

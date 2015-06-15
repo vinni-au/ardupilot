@@ -162,7 +162,6 @@ public:
         k_param_motors = 90,
         k_param_motors_alternate_start,
         k_param_motors_auto_disarm_delay,
-        k_param_ekf_fs_land,
 
         //
         // 100: Inertial Nav
@@ -363,7 +362,6 @@ public:
     AP_Int16        poshold_brake_angle_max;    // PosHold flight mode's max lean angle during braking in centi-degrees
     
     AP_Int32        flight_count;
-    AP_Int8         ekf_fs_land;
 
     // Waypoints
     //

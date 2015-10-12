@@ -324,6 +324,7 @@ static AP_OpticalFlow_ADNS3080 optflow;
 static const uint8_t num_gcs = MAVLINK_COMM_NUM_BUFFERS;
 static GCS_MAVLINK gcs[MAVLINK_COMM_NUM_BUFFERS];
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // SONAR
 #if CONFIG_SONAR == ENABLED
@@ -755,6 +756,13 @@ static struct {
 ////////////////////////////////////////////////////////////////////////////////
 static void pre_arm_checks(bool display_failure);
 
+//
+#define GCS_DATA_STREAM_SEND_HZ 100
+#if MAIN_LOOP_RATE == 400
+#define GCS_DATA_STREAM_SEND_INTERVAL 4
+#else
+#define GCS_DATA_STREAM_SEND_INTERVAL 1
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // Top-level logic
 ////////////////////////////////////////////////////////////////////////////////
@@ -870,8 +878,8 @@ static const AP_Scheduler::Task scheduler_tasks[] PROGMEM = {
     { crash_check,          10,      20 },
     { gcs_check_input,	     2,     550 },
     { gcs_send_heartbeat,  100,     150 },
-    { gcs_send_deferred,     2,     720 },
-    { gcs_data_stream_send,  2,     950 },
+    { gcs_send_deferred,     GCS_DATA_STREAM_SEND_INTERVAL,     720 },
+    { gcs_data_stream_send,  GCS_DATA_STREAM_SEND_INTERVAL,     950 },
     { update_mount,          2,     450 },
     { ten_hz_logging_loop,  10,     300 },
     { fifty_hz_logging_loop, 2,     220 },

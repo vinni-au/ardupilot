@@ -631,6 +631,14 @@ bool GCS_MAVLINK::try_send_message(enum ap_message id)
     return true;
 }
 
+void GCS_MAVLINK::send_digicam_control(void)
+{
+    mavlink_msg_digicam_control_send(chan,
+            1, MAV_COMP_ID_CAMERA,
+            0, 0, 0, 0,
+            1, 0, 0, 0);
+}
+
 
 const AP_Param::GroupInfo GCS_MAVLINK::var_info[] PROGMEM = {
     // @Param: RAW_SENS
@@ -713,11 +721,20 @@ const AP_Param::GroupInfo GCS_MAVLINK::var_info[] PROGMEM = {
     // @Increment: 1
     // @User: Advanced
     AP_GROUPINFO("PARAMS",   8, GCS_MAVLINK, streamRates[8],  0),
+
+    // @Param: RCOUT
+    // @DisplayName: PWM out stream rate to ground station
+    // @Description: Stream rate of SERVO_OUTPUT_RAW to ground station
+    // @Units: Hz
+    // @Range: 0 100
+    // @Increment: 1
+    // @User: Advanced
+    AP_GROUPINFO("RCOUT",    9, GCS_MAVLINK, streamRates[9],  0),
     AP_GROUPEND
 };
 
 
-// see if we should send a stream now. Called at 50Hz
+// see if we should send a stream now. Called at GCS_DATA_STREAM_SEND_HZ Hz
 bool GCS_MAVLINK::stream_trigger(enum streams stream_num)
 {
     if (stream_num >= NUM_STREAMS) {
@@ -738,14 +755,14 @@ bool GCS_MAVLINK::stream_trigger(enum streams stream_num)
 
     if (stream_ticks[stream_num] == 0) {
         // we're triggering now, setup the next trigger point
-        if (rate > 50) {
-            rate = 50;
+        if (rate > GCS_DATA_STREAM_SEND_HZ) {
+            rate = GCS_DATA_STREAM_SEND_HZ;
         }
-        stream_ticks[stream_num] = (50 / rate) + stream_slowdown;
+        stream_ticks[stream_num] = (GCS_DATA_STREAM_SEND_HZ / rate) + stream_slowdown;
         return true;
     }
 
-    // count down at 50Hz
+    // count down at GCS_DATA_STREAM_SEND_HZ Hz
     stream_ticks[stream_num]--;
     return false;
 }
@@ -820,6 +837,12 @@ GCS_MAVLINK::data_stream_send(void)
 
     if (gcs_out_of_time) return;
 
+    if (stream_trigger(STREAM_RC_OUT)) {
+        send_message(MSG_RADIO_OUT);
+    }
+
+    if (gcs_out_of_time) return;
+
     if (stream_trigger(STREAM_EXTRA1)) {
         send_message(MSG_ATTITUDE);
         send_message(MSG_SIMSTATE);
@@ -843,7 +866,6 @@ GCS_MAVLINK::data_stream_send(void)
 #endif
     }
 }
-
 
 void GCS_MAVLINK::handle_guided_request(AP_Mission::Mission_Command &cmd)
 {
@@ -1449,7 +1471,7 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
  */
 static void mavlink_delay_cb()
 {
-    static uint32_t last_1hz, last_50hz, last_5s;
+    static uint32_t last_1hz, last_50hz, last_5s, last_100hz;
     if (!gcs[0].initialised || in_mavlink_delay) return;
 
     in_mavlink_delay = true;
@@ -1465,7 +1487,9 @@ static void mavlink_delay_cb()
         gcs_check_input();
         gcs_data_stream_send();
         gcs_send_deferred();
+
         notify.update();
+
     }
     if (tnow - last_5s > 5000) {
         last_5s = tnow;

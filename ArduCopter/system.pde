@@ -153,6 +153,9 @@ static void init_ardupilot()
     // init the GCS
     gcs[0].init(hal.uartA);
 
+    // init the geoscan controller
+    gcs[1].setup_uart(hal.uartC, 57600, 128, 128);
+
     // Register the mavlink service callback. This will run
     // anytime there are more than 5ms remaining in a call to
     // hal.scheduler->delay.
@@ -167,7 +170,7 @@ static void init_ardupilot()
     // we have a 2nd serial port for telemetry on all boards except
     // APM2. We actually do have one on APM2 but it isn't necessary as
     // a MUX is used
-    gcs[1].setup_uart(hal.uartC, map_baudrate(g.serial1_baud), 128, 128);
+    gcs[1].setup_uart(hal.uartC, 57600, 128, 128);
 #endif
 
 #if MAVLINK_COMM_NUM_BUFFERS > 2

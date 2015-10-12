@@ -169,6 +169,7 @@ public:
                   STREAM_EXTRA2,
                   STREAM_EXTRA3,
                   STREAM_PARAMS,
+                  STREAM_RC_OUT,
                   NUM_STREAMS};
 
     // see if we should send a stream now. Called at 50Hz
@@ -198,6 +199,7 @@ public:
     void send_sensor_offsets(const AP_InertialSensor &ins, const Compass &compass, AP_Baro &barometer);
     void send_ahrs(AP_AHRS &ahrs);
     void send_battery2(const AP_BattMonitor &battery);
+    void send_digicam_control();
 
     // return a bitmap of active channels. Used by libraries to loop
     // over active channels to send to all active channels    

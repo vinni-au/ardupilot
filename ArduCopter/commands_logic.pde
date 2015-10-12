@@ -904,8 +904,12 @@ static void do_take_picture()
 {
 #if CAMERA == ENABLED
     camera.trigger_pic();
+    if (gcs[1].initialised) {
+        gcs[1].send_digicam_control();
+    }
     if (should_log(MASK_LOG_CAMERA)) {
         DataFlash.Log_Write_Camera(ahrs, gps, current_loc);
     }
+    gcs_send_text_P(SEVERITY_LOW, PSTR("Camera triggered!"));
 #endif
 }

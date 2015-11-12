@@ -76,18 +76,18 @@ static void arm_motors_check()
     }
 }
 
-// auto_disarm_check - disarms the copter if it has been sitting on the ground in manual mode with throttle low for at least 15 seconds
+// auto_disarm_check - disarms the copter if it has been sitting on the ground with throttle low for at least MOTOR_DISARM_DEL seconds
 // called at 1hz
 static void auto_disarm_check()
 {
     // exit immediately if we are already disarmed or throttle is not zero
-    if (!motors.armed() || !ap.throttle_zero) {
+    if (!motors.armed() || g.rc_3.servo_out/10 > 1) {
         auto_disarming_counter = 0;
         return;
     }
 
     // allow auto disarm in manual flight modes or Loiter/AltHold if we're landed
-    if (manual_flight_mode(control_mode) || ap.land_complete) {
+    if (ap.land_complete) {
         auto_disarming_counter++;
 
         if(auto_disarming_counter >= g.motors_auto_disarm_delay.get()) {
@@ -341,6 +341,8 @@ static void pre_arm_checks(bool display_failure)
         return;
     }
 
+
+#if AC_FENCE == ENABLED
     // check fence is initialised
     if(!fence.pre_arm_check()) {
         if (display_failure) {
@@ -348,6 +350,7 @@ static void pre_arm_checks(bool display_failure)
         }
         return;
     }
+#endif
 
     // check INS
     if ((g.arming_check == ARMING_CHECK_ALL) || (g.arming_check & ARMING_CHECK_INS)) {

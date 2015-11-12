@@ -200,6 +200,7 @@ public:
     void send_ahrs(AP_AHRS &ahrs);
     void send_battery2(const AP_BattMonitor &battery);
     void send_digicam_control();
+    void send_mount_control(float tilt, float roll, float pan);
 
     // return a bitmap of active channels. Used by libraries to loop
     // over active channels to send to all active channels    

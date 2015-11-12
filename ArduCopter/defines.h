@@ -189,7 +189,8 @@ enum AutoMode {
     Auto_CircleMoveToEdge,
     Auto_Circle,
     Auto_Spline,
-    Auto_NavGuided
+    Auto_NavGuided,
+    Auto_Panorama
 };
 
 // Guided modes
@@ -216,6 +217,16 @@ enum FlipState {
     Flip_Roll,
     Flip_Recover,
     Flip_Abandon
+};
+
+// Panorama states
+enum PanoramaState {
+    Pan_FaceYaw,
+    Pan_Tilt,
+    Pan_WaitSecTilt,
+    Pan_DoPhoto,
+    Pan_WaitFeedback,
+    Pan_Ended
 };
 
 // LAND state

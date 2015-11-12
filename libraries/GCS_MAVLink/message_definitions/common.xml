@@ -590,6 +590,16 @@
                     <param index="6">Longitude/Y of goal</param>
                     <param index="7">Altitude/Z of goal</param>
                </entry>
+               <entry value="83" name="MAV_CMD_NAV_PANORAMA">
+                    <description>Make a panoramic photo</description>
+                    <param index="1">Start azimuth in degrees</param>
+                    <param index="2">End azituth in degrees</param>
+                    <param index="3">Azimuth step</param>
+                    <param index="4">Pitch step</param>
+                    <param index="5">Latitude/X of goal</param>
+                    <param index="6">Longitude/Y of goal</param>
+                    <param index="7">Altitude/Z of goal</param>
+               </entry>
 
                <!-- IDs 90 and 91 are reserved until the end of 2014,
                     as they were used in some conflicting proposals
@@ -2450,7 +2460,7 @@
         <message id="147" name="BATTERY_STATUS">
             <description>Battery information</description>
             <field type="uint8_t" name="id">Battery ID</field>
-            <field type="uint8_t" name="function" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
+            <field type="uint8_t" name="func" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
             <field type="uint8_t" name="type" enum="MAV_BATTERY_TYPE">Type (chemistry) of the battery</field>
             <field type="int16_t" name="temperature">Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.</field>
             <field type="uint16_t[10]" name="voltages">Battery voltage of cells, in millivolts (1 = 1 millivolt)</field>

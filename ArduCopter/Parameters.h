@@ -164,6 +164,12 @@ public:
         k_param_motors_auto_disarm_delay,
 
         //
+        // 93: Panorama
+        //
+        k_param_panorama_tilt_delay,
+        k_param_panorama_photo_delay,
+
+        //
         // 100: Inertial Nav
         //
         k_param_inertial_nav = 100,
@@ -254,6 +260,7 @@ public:
         k_param_radio_tuning_high,
         k_param_radio_tuning_low,
         k_param_fs_gcs_clear_rc, // 190
+        k_param_fs_gcs_timeout,
         k_param_rc_speed = 192,
         k_param_failsafe_battery_enabled,
         k_param_throttle_mid,
@@ -353,6 +360,9 @@ public:
     AP_Int8         motors_alternate_start;     // Start motors consequently
     AP_Int8         motors_auto_disarm_delay;   // Delay in seconds before auto disarm
 
+    AP_Int16        panorama_tilt_delay;        // Panorama wait for tilt delay
+    AP_Int16        panorama_photo_delay;       // Panorama wait for photo delay
+
     AP_Int8         rssi_pin;
     AP_Float        rssi_range;                 // allows to set max voltage for rssi pin such as 5.0, 3.3 etc. 
     AP_Int8         wp_yaw_behavior;            // controls how the autopilot controls yaw during missions
@@ -402,6 +412,7 @@ public:
     AP_Int8         ch8_option;
     AP_Int8         arming_check;
     AP_Int8         fs_gcs_clear_rc;
+    AP_Int16        fs_gcs_timeout;
 
     AP_Int8         land_repositioning;
     AP_Float        ekfcheck_thresh;

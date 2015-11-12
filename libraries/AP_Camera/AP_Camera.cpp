@@ -156,6 +156,14 @@ AP_Camera::control_msg(mavlink_message_t* msg)
     }
 }
 
+void
+AP_Camera::feedback_msg(mavlink_message_t* msg)
+{
+    __mavlink_camera_feedback_t packet;
+    mavlink_msg_camera_feedback_decode(msg, &packet);
+    _last_img_idx = packet.img_idx;
+}
+
 
 /*  update location, for triggering by GPS distance moved
     This function returns true if a picture should be taken

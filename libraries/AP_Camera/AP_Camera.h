@@ -45,12 +45,16 @@ public:
     // MAVLink methods
     void            configure_msg(mavlink_message_t* msg);
     void            control_msg(mavlink_message_t* msg);
+    void            feedback_msg(mavlink_message_t* msg);
 
     // set camera trigger distance in a mission
     void            set_trigger_distance(uint32_t distance_m) { _trigg_dist.set(distance_m); }
 
     // Update location of vehicle and return true if a picture should be taken
     bool update_location(const struct Location &loc);
+
+    //
+    uint16_t        get_last_img_idx() const { return _last_img_idx; }
 
     static const struct AP_Param::GroupInfo        var_info[];
 
@@ -67,6 +71,8 @@ private:
 
     AP_Float        _trigg_dist;     // distance between trigger points (meters)
     struct Location _last_location;
+
+    uint16_t        _last_img_idx; // index of last image
 
 };
 

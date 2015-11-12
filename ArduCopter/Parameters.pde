@@ -494,6 +494,12 @@ const AP_Param::Info var_info[] PROGMEM = {
     // @User: Advanced
     GSCALAR(fs_gcs_clear_rc, "FS_GCS_CLEARRC", FS_GCS_CLEARRC_DEFAULT),
 
+    GSCALAR(fs_gcs_timeout, "FS_GCS_TIMEOUT", FS_GCS_TIMEOUT_DEFAULT),
+
+    GSCALAR(panorama_tilt_delay, "PAN_TILT_DELAY", PAN_TILT_DELAY_DEFAULT),
+
+    GSCALAR(panorama_photo_delay, "PAN_PHOTO_DELAY", PAN_PHOTO_DELAY_DEFAULT),
+
 
 #if FRAME_CONFIG ==     HELI_FRAME
     // @Group: HS1_

@@ -506,6 +506,14 @@ bool AP_Mission::mavlink_to_mission_cmd(const mavlink_mission_item_t& packet, AP
         cmd.p1 = packet.param1;                         // delay at waypoint in seconds
         break;
 
+    case MAV_CMD_NAV_PANORAMA:
+        copy_location = false;
+        cmd.p1 = packet.param4;
+        cmd.content.panorama.start_pan = packet.param1;
+        cmd.content.panorama.end_pan = packet.param2;
+        cmd.content.panorama.step_pan = packet.param3;
+        break;
+
 #ifdef MAV_CMD_NAV_GUIDED
     case MAV_CMD_NAV_GUIDED:                     // MAV ID: 90
         cmd.p1 = packet.param1;                         // max time in seconds the external controller will be allowed to control the vehicle
@@ -780,6 +788,13 @@ bool AP_Mission::mission_cmd_to_mavlink(const AP_Mission::Mission_Command& cmd, 
         packet.z = cmd.content.nav_velocity.z;          // vertical (i.e. up) velocity in m/s
         break;
 #endif
+
+    case MAV_CMD_NAV_PANORAMA:
+        packet.param1 = cmd.content.panorama.start_pan;
+        packet.param2 = cmd.content.panorama.end_pan;
+        packet.param3 = cmd.content.panorama.step_pan;
+        packet.param4 = cmd.p1;
+        break;
 
     case MAV_CMD_CONDITION_DELAY:                       // MAV ID: 112
         packet.param1 = cmd.content.delay.seconds;      // delay in seconds

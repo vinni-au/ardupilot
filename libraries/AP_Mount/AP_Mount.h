@@ -68,6 +68,13 @@ public:
 
     void                            set_mode(enum MAV_MOUNT_MODE mode);
 
+    float                   get_tilt_angle_min() const { return _tilt_angle_min.get() * 0.01f; }
+    float                   get_tilt_angle_max() const { return _tilt_angle_max.get() * 0.01f; }
+    float                   get_pan_angle_min() const { return _pan_angle_min.get() * 0.01f; }
+    float                   get_pan_angle_max() const { return _pan_angle_max.get() * 0.01f; }
+    float                   get_roll_angle_min() const { return _roll_angle_min.get() * 0.01f; }
+    float                   get_roll_angle_max() const { return _roll_angle_max.get() * 0.01f; }
+
 private:
 
     //methods

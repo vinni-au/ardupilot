@@ -58,6 +58,12 @@ public:
         float z;                // vertical velocity in m/s
     };
 
+    struct PACKED Panorama_Command {
+        float start_pan;
+        float end_pan;
+        float step_pan;
+    };
+
     // jump command structure
     struct PACKED Jump_Command {
         uint16_t target;        // target command id
@@ -127,6 +133,9 @@ public:
 
         // Nav_Velocity_Command
         Nav_Velocity_Command nav_velocity;
+
+        //
+        Panorama_Command panorama;
 
         // jump structure
         Jump_Command jump;

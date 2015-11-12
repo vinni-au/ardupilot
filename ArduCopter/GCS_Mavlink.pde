@@ -91,23 +91,24 @@ static NOINLINE void send_heartbeat(mavlink_channel_t chan)
 
     mavlink_msg_heartbeat_send(
         chan,
-#if (FRAME_CONFIG == QUAD_FRAME)
-        MAV_TYPE_QUADROTOR,
-#elif (FRAME_CONFIG == TRI_FRAME)
-        MAV_TYPE_TRICOPTER,
-#elif (FRAME_CONFIG == HEXA_FRAME || FRAME_CONFIG == Y6_FRAME)
-        MAV_TYPE_HEXAROTOR,
-#elif (FRAME_CONFIG == OCTA_FRAME || FRAME_CONFIG == OCTA_QUAD_FRAME)
-        MAV_TYPE_OCTOROTOR,
-#elif (FRAME_CONFIG == HELI_FRAME)
-        MAV_TYPE_HELICOPTER,
-#elif (FRAME_CONFIG == SINGLE_FRAME)  //because mavlink did not define a singlecopter, we use a rocket
-        MAV_TYPE_ROCKET,
-#elif (FRAME_CONFIG == COAX_FRAME)  //because mavlink did not define a singlecopter, we use a rocket
-        MAV_TYPE_ROCKET,
-#else
-  #error Unrecognised frame type
-#endif
+        4
+//#if (FRAME_CONFIG == QUAD_FRAME)
+//        MAV_TYPE_QUADROTOR,
+//#elif (FRAME_CONFIG == TRI_FRAME)
+//        MAV_TYPE_TRICOPTER,
+//#elif (FRAME_CONFIG == HEXA_FRAME || FRAME_CONFIG == Y6_FRAME)
+//        MAV_TYPE_HEXAROTOR,
+//#elif (FRAME_CONFIG == OCTA_FRAME || FRAME_CONFIG == OCTA_QUAD_FRAME)
+//        MAV_TYPE_OCTOROTOR,
+//#elif (FRAME_CONFIG == HELI_FRAME)
+//        MAV_TYPE_HELICOPTER,
+//#elif (FRAME_CONFIG == SINGLE_FRAME)  //because mavlink did not define a singlecopter, we use a rocket
+//        MAV_TYPE_ROCKET,
+//#elif (FRAME_CONFIG == COAX_FRAME)  //because mavlink did not define a singlecopter, we use a rocket
+//        MAV_TYPE_ROCKET,
+//#else
+//  #error Unrecognised frame type
+//#endif
         17, // MAV_AUTOPILOT_ARDUPILOTMEGA
         base_mode,
         custom_mode,
@@ -637,6 +638,12 @@ void GCS_MAVLINK::send_digicam_control(void)
             1, MAV_COMP_ID_CAMERA,
             0, 0, 0, 0,
             1, 0, 0, 0);
+}
+
+void GCS_MAVLINK::send_mount_control(float tilt, float roll, float pan)
+{
+    mavlink_msg_mount_control_send(chan, 1, MAV_COMP_ID_SYSTEM_CONTROL,
+            tilt*100, roll*100, pan*100, 0);
 }
 
 
@@ -1363,6 +1370,11 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
     case MAVLINK_MSG_ID_DIGICAM_CONTROL:
         camera.control_msg(msg);
         break;
+
+    case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
+        camera.feedback_msg(msg);
+        gcs_send_text_fmt(PSTR("got passport: %d"), camera.get_last_img_idx());
+        break;
 #endif // CAMERA == ENABLED
 
 #if MOUNT == ENABLED
@@ -1457,7 +1469,6 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
         break;
     }  
 #endif // AC_RALLY == ENABLED
-
 
     }     // end switch
 } // end handle mavlink

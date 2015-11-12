@@ -614,6 +614,22 @@ static float yaw_look_ahead_bearing;
 static int32_t condition_value;  // used in condition commands (eg delay, change alt, etc.)
 static uint32_t condition_start;
 
+////////////////////////////////////////////////////////////////////////////////
+// Panorama scripting
+////////////////////////////////////////////////////////////////////////////////
+static PanoramaState panorama_state;
+static float panorama_start_pan;
+static float panorama_target_pan;
+static float panorama_step_pan;
+static float panorama_step_tilt;
+static float panorama_tilt_min;
+static float panorama_tilt_max;
+static uint32_t panorama_wait_start;
+static uint8_t panorama_pan_steps;
+static uint8_t panorama_pan_step;
+static uint8_t panorama_tilt_steps;
+static uint8_t panorama_tilt_step;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // IMU variables

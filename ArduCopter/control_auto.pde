@@ -76,6 +76,10 @@ static void auto_run()
         auto_nav_guided_run();
         break;
 #endif
+
+    case Auto_Panorama:
+        auto_panorama_run();
+        break;
     }
 }
 
@@ -408,6 +412,67 @@ void auto_nav_guided_run()
     guided_run();
 }
 #endif  // NAV_GUIDED
+
+void auto_panorama_start()
+{
+    auto_mode = Auto_Panorama;
+    panorama_state = Pan_FaceYaw;
+    panorama_target_pan = panorama_start_pan;
+}
+
+void auto_panorama_run()
+{
+    float panorama_target_tilt;
+    switch (panorama_state) {
+    case Pan_FaceYaw:
+        if (labs(wrap_180_cd(ahrs.yaw_sensor-panorama_target_pan*100)) <= 100) {
+            panorama_state = Pan_Tilt;
+        }
+        break;
+    case Pan_Tilt:
+        panorama_state = Pan_WaitSecTilt;
+        panorama_wait_start = millis();
+        panorama_target_tilt = panorama_step_tilt * panorama_tilt_step;
+        do_move_mount(0, panorama_tilt_min + panorama_target_tilt, 0);
+        gcs_send_text_fmt(PSTR("tilt: %f"), panorama_tilt_min + panorama_target_tilt);
+        break;
+    case Pan_WaitSecTilt:
+        if (millis() - panorama_wait_start > g.panorama_tilt_delay.get()) {
+            panorama_state = Pan_DoPhoto;
+        }
+        break;
+    case Pan_DoPhoto:
+        panorama_state = Pan_WaitFeedback;
+        do_take_picture();
+        panorama_wait_start = millis();
+        break;
+    case Pan_WaitFeedback:
+        if (millis() - panorama_wait_start > g.panorama_photo_delay.get()) {
+            gcs_send_text_fmt(PSTR("%d/%d  %d/%d"), panorama_pan_step, panorama_pan_steps,
+                    panorama_tilt_step, panorama_tilt_steps);
+            if (panorama_tilt_step >= panorama_tilt_steps) {
+                if (panorama_pan_step >= panorama_pan_steps) {
+                    panorama_state = Pan_Ended;
+                } else {
+                    panorama_state = Pan_FaceYaw;
+                    panorama_target_pan += panorama_step_pan;
+                    ++panorama_pan_step;
+                    panorama_tilt_step = 0;
+                }
+            } else {
+                panorama_state = Pan_Tilt;
+                ++panorama_tilt_step;
+            }
+        }
+        break;
+    }
+
+    wp_nav.update_wpnav();
+
+    pos_control.update_z_controller();
+
+    attitude_control.angle_ef_roll_pitch_yaw(wp_nav.get_roll(), wp_nav.get_pitch(), wrap_360_cd(panorama_target_pan*100), true);
+}
 
 // get_default_auto_yaw_mode - returns auto_yaw_mode based on WP_YAW_BEHAVIOR parameter
 // set rtl parameter to true if this is during an RTL

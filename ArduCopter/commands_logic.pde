@@ -11,6 +11,7 @@ static void do_spline_wp(const AP_Mission::Mission_Command& cmd);
 #if NAV_GUIDED == ENABLED
 static void do_nav_guided(const AP_Mission::Mission_Command& cmd);
 #endif
+static void do_panorama(const AP_Mission::Mission_Command& cmd);
 static void do_wait_delay(const AP_Mission::Mission_Command& cmd);
 static void do_within_distance(const AP_Mission::Mission_Command& cmd);
 static void do_change_alt(const AP_Mission::Mission_Command& cmd);
@@ -27,6 +28,7 @@ static bool verify_spline_wp(const AP_Mission::Mission_Command& cmd);
 #if NAV_GUIDED == ENABLED
 static bool verify_nav_guided(const AP_Mission::Mission_Command& cmd);
 #endif
+static bool verify_panorama(const AP_Mission::Mission_Command& cmd);
 static void auto_spline_start(const Vector3f& destination, bool stopped_at_start, AC_WPNav::spline_segment_end_type seg_end_type, const Vector3f& next_spline_destination);
 
 // start_command - this function will be called when the ap_mission lib wishes to start a new command
@@ -81,6 +83,10 @@ static bool start_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 #endif
+
+    case MAV_CMD_NAV_PANORAMA:
+        do_panorama(cmd);
+        break;
 
     //
     // conditional commands
@@ -219,6 +225,10 @@ static bool verify_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 #endif
+
+    case MAV_CMD_NAV_PANORAMA:
+        return verify_panorama(cmd);
+        break;
 
     ///
     /// conditional commands
@@ -511,6 +521,27 @@ static void do_nav_guided(const AP_Mission::Mission_Command& cmd)
 #endif  // NAV_GUIDED
 
 
+static void do_panorama(const AP_Mission::Mission_Command& cmd)
+{
+    panorama_start_pan = cmd.content.panorama.start_pan;
+    panorama_step_pan = cmd.content.panorama.step_pan;
+    panorama_pan_steps = (cmd.content.panorama.end_pan - panorama_start_pan) / panorama_step_pan;
+    panorama_pan_step = 0;
+    panorama_step_tilt = cmd.p1;
+    panorama_tilt_max = 0;
+    panorama_tilt_min = -90;
+#if MOUNT == ENABLED
+    panorama_tilt_min = camera_mount.get_tilt_angle_min();
+    panorama_tilt_max = camera_mount.get_tilt_angle_max();
+#endif
+    panorama_tilt_steps = (panorama_tilt_max - panorama_tilt_min) / cmd.p1;
+    panorama_tilt_step = 0;
+
+    gcs_send_text_fmt(PSTR("step: %f"), panorama_step_tilt);
+
+    auto_panorama_start();
+}
+
 #if PARACHUTE == ENABLED
 // do_parachute - configure or release parachute
 static void do_parachute(const AP_Mission::Mission_Command& cmd)
@@ -724,6 +755,16 @@ static bool verify_nav_guided(const AP_Mission::Mission_Command& cmd)
 #endif  // NAV_GUIDED
 
 
+static bool verify_panorama(const AP_Mission::Mission_Command& cmd)
+{
+    if (panorama_state == Pan_Ended) {
+        panorama_pan_step = 0;
+        panorama_tilt_step = 0;
+        return true;
+    }
+    return false;
+}
+
 /********************************************************************************/
 //	Condition (May) commands
 /********************************************************************************/
@@ -904,12 +945,19 @@ static void do_take_picture()
 {
 #if CAMERA == ENABLED
     camera.trigger_pic();
-    if (gcs[1].initialised) {
-        gcs[1].send_digicam_control();
-    }
+//    if (gcs[1].initialised) {
+//        gcs[1].send_digicam_control();
+//    }
     if (should_log(MASK_LOG_CAMERA)) {
         DataFlash.Log_Write_Camera(ahrs, gps, current_loc);
     }
-    gcs_send_text_P(SEVERITY_LOW, PSTR("Camera triggered!"));
+//    gcs_send_text_P(SEVERITY_LOW, PSTR("Camera triggered!"));
 #endif
+}
+
+// do_move_mount - move geoscan mount to desired roll, tilt and pan
+static void do_move_mount(float roll, float tilt, float pan) {
+    if (gcs[1].initialised) {
+        gcs[1].send_mount_control(tilt, roll, pan);
+    }
 }

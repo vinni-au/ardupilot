@@ -416,6 +416,8 @@ static void do_circle(const AP_Mission::Mission_Command& cmd)
 
     // set circle controller's center
     circle_nav.set_center(circle_center);
+    float rate = fabs(circle_nav.get_rate());
+    circle_nav.set_rate(cmd.content.location.flags.loiter_ccw ? rate : -rate);
 
     // set circle radius
     if (circle_radius_m != 0) {

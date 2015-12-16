@@ -201,7 +201,7 @@ void SITL_State::_sitl_setup(void)
 #endif
 	_rcout_addr.sin_family = AF_INET;
 	_rcout_addr.sin_port = htons(_rcout_port);
-	inet_pton(AF_INET, "127.0.0.1", &_rcout_addr.sin_addr);
+	inet_pton(AF_INET, GCS_IP, &_rcout_addr.sin_addr);
 
 	_setup_timer();
 #ifndef HIL_MODE

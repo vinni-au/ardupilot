@@ -127,6 +127,13 @@ public:
         float meters;           // distance
     };
 
+    // control mount angles
+    struct PACKED Do_Mount_Control {
+        float roll;
+        float tilt;
+        float pan;
+    };
+
     union PACKED Content {
         // Nav_Guided_Command
         Nav_Guided_Command nav_guided;
@@ -166,6 +173,9 @@ public:
 
         // cam trigg distance
         Cam_Trigg_Distance cam_trigg_dist;
+
+        // Do_Mount_Control
+        Do_Mount_Control mount_angles;
 
         // location
         Location location;      // Waypoint location

@@ -157,6 +157,12 @@ static bool start_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 
+#if MOUNT == ENABLED
+    case MAV_CMD_DO_MOUNT_CONTROL:
+        do_move_mount(cmd.content.mount_angles.roll, cmd.content.mount_angles.tilt, cmd.content.mount_angles.pan);
+        break;
+#endif
+
 #if PARACHUTE == ENABLED
     case MAV_CMD_DO_PARACHUTE:                          // Mission command to configure or release parachute
         do_parachute(cmd);
@@ -959,6 +965,7 @@ static void do_take_picture()
 
 // do_move_mount - move geoscan mount to desired roll, tilt and pan
 static void do_move_mount(float roll, float tilt, float pan) {
+    gcs_send_text_fmt(PSTR("Moving mount: %f %f %f"), tilt, roll, pan);
     if (gcs[1].initialised) {
         gcs[1].send_mount_control(tilt, roll, pan);
     }

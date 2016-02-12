@@ -24,7 +24,7 @@ static void gcs_send_heartbeat(void)
     gcs_send_message(MSG_HEARTBEAT);
 }
 
-static void gcs_send_deferred(void)
+static void gcs_send_ deferred(void)
 {
     gcs_send_message(MSG_RETRY_DEFERRED);
 }
@@ -91,7 +91,7 @@ static NOINLINE void send_heartbeat(mavlink_channel_t chan)
 
     mavlink_msg_heartbeat_send(
         chan,
-        5,
+        6,
 //#if (FRAME_CONFIG == QUAD_FRAME)
 //        MAV_TYPE_QUADROTOR,
 //#elif (FRAME_CONFIG == TRI_FRAME)

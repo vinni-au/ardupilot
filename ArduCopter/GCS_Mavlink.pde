@@ -24,7 +24,7 @@ static void gcs_send_heartbeat(void)
     gcs_send_message(MSG_HEARTBEAT);
 }
 
-static void gcs_send_deferred(void)
+static void gcs_send_ deferred(void)
 {
     gcs_send_message(MSG_RETRY_DEFERRED);
 }

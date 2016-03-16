@@ -383,14 +383,7 @@ void SITL_State::_fdm_input(void)
 			return;
 		}
 
-		if (d.fg_pkt.latitude == 0 ||
-		    d.fg_pkt.longitude == 0 ||
-		    d.fg_pkt.altitude <= 0) {
-			// garbage input
-			return;
-		}
-
-        if (_sitl != NULL) {
+		if (_sitl != NULL) {
             _sitl->state = d.fg_pkt;
             // prevent bad inputs from SIM from corrupting our state
             double *v = &_sitl->state.latitude;
